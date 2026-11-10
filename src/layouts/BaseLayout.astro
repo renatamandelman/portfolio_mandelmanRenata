@@ -1,0 +1,56 @@
+---
+/**
+ * BaseLayout — esqueleto HTML común a todas las páginas.
+ * Responsabilidad: <head> (meta, SEO, fuentes, estilos globales),
+ * link de salto para teclado y restaurar la vista elegida antes del primer paint.
+ */
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = 'Renata Mandelman — Diseño Multimedial & Desarrollo Web',
+  description = 'Portfolio de Renata Mandelman: creación de contenido para redes y desarrollo web frontend, en una misma pantalla.',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="es" data-view="design">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#FAF9F6" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <title>{title}</title>
+
+    <!--
+      Se ejecuta ANTES de pintar la página: lee la vista guardada y la aplica
+      a <html data-view>. Evita el "salto" visual de split → code al recargar.
+    -->
+    <script is:inline>
+      try {
+        const saved = localStorage.getItem('rm-view');
+        if (['content', 'design', 'code'].includes(saved)) {
+          document.documentElement.dataset.view = saved;
+        }
+      } catch (_) { /* localStorage bloqueado: queda "design" por defecto */ }
+    </script>
+  </head>
+
+  <body class="min-h-dvh">
+    <a
+      href="#main"
+      class="sr-only-focusable fixed top-3 left-3 z-50 rounded-full bg-ink px-4 py-2 text-sm text-cream"
+    >
+      Saltar al contenido
+    </a>
+    <slot />
+  </body>
+</html>

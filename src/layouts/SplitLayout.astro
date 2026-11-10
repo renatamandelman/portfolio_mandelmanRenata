@@ -1,0 +1,305 @@
+---
+/**
+ * SplitLayout — Estructura "Dual View" del portfolio.
+ *
+ * Responsabilidad: organizar la pantalla en dos mundos (Content | Code)
+ * y reaccionar al modo elegido en ViewToggle mediante <html data-view>.
+ *
+ * Slots:
+ *   - "hero"    → nombre + bajada (arriba, ocupa todo el ancho)
+ *   - "content" → panel izquierdo: Creación de Contenido / RRSS
+ *   - "code"    → panel derecho: Desarrollo Web
+ *   - "design"  → panel de abajo: Diseño gráfico / UX-UI (solo en modo design)
+ *   - "footer"  → acá irá DynamicApiWidget
+ *
+ * Modos (los escribe ViewToggle en <html data-view>):
+ *   design (inicio) → vista dual Content | Code + panel Design centrado abajo
+ *   content / code  → se ve ese panel solo
+ *
+ * Comportamiento por tamaño:
+ *   Desktop (≥ 900px)  design  → 50 / 50
+ *                      content → contenido a pantalla completa + riel lateral "Code"
+ *                      code    → al revés
+ *   Mobile  (< 900px)  design  → una columna: contenido, código y diseño
+ *                      content/code → se muestra solo el panel elegido
+ */
+import BaseLayout from './BaseLayout.astro';
+import ViewToggle from '../components/ViewToggle.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const navLinks = [
+  { href: '#proyectos', label: 'Proyectos' },
+  { href: '#sobre-mi', label: 'Sobre mí' },
+  { href: '#experiencia', label: 'Experiencia' },
+];
+---
+
+<BaseLayout {...Astro.props}>
+  <header class="site-header border-b border-line">
+    <div
+      class="mx-auto flex max-w-[1440px] flex-col items-center gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_auto_1fr] md:px-10"
+    >
+      <a href="/" class="text-sm font-bold tracking-wide whitespace-nowrap uppercase">Renata Mandelman</a>
+      <nav aria-label="Principal">
+        <ul class="flex gap-5 text-[0.6875rem] tracking-[0.14em] whitespace-nowrap uppercase md:gap-10 md:text-xs">
+          {
+            navLinks.map((link) => (
+              <li>
+                <a href={link.href} class="transition-colors hover:text-accent-ink">
+                  {link.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <!-- Hora de Buenos Aires en vivo (la actualiza el script de abajo) -->
+      <p class="hidden justify-self-end font-mono text-xs text-muted sm:block">
+        BA <time data-clock>--:--</time>
+      </p>
+    </div>
+  </header>
+
+  <main id="main" class="mx-auto max-w-[1440px]">
+    <!-- .stage: referencia para centrar el nombre flotante sobre el split
+         (el panel Design queda afuera para que no corra el centro hacia abajo) -->
+    <div class="stage">
+      <!-- IDENTIDAD: nombre + toggle.
+           Desktop grande en vista dual → flota en el centro, encima del divisor.
+           Resto de los casos → display: contents (como si el div no existiera) y queda arriba. -->
+      <div class="identity">
+        <!-- HERO -->
+        <section class="hero px-5 pt-14 pb-8 text-center md:px-10 md:pt-20" aria-label="Presentación">
+          <slot name="hero" />
+        </section>
+
+        <!-- Toggle: queda "pegado" arriba al scrollear para cambiar de vista en cualquier momento -->
+        <div class="toggle-dock">
+          <ViewToggle />
+        </div>
+      </div>
+
+      <!-- SPLIT -->
+      <div class="split">
+        <section
+          class="pane pane--content"
+          id="pane-content"
+          aria-labelledby="pane-content-title"
+        >
+          <button class="rail" type="button" data-rail="content" aria-label="Volver a la vista Design (dual)">
+            <span>Content</span>
+          </button>
+          <div class="pane-body">
+            <slot name="content" />
+          </div>
+        </section>
+
+        <div class="divider" aria-hidden="true"></div>
+
+        <section class="pane pane--code" id="pane-code" aria-labelledby="pane-code-title">
+          <button class="rail" type="button" data-rail="code" aria-label="Volver a la vista Design (dual)">
+            <span>Code</span>
+          </button>
+          <div class="pane-body">
+            <slot name="code" />
+          </div>
+        </section>
+      </div>
+    </div>
+
+    <!-- DESIGN: debajo del split, centrado. Solo se ve con data-view="design" -->
+    <section class="pane--design" id="pane-design" aria-labelledby="pane-design-title">
+      <div class="pane-body">
+        <slot name="design" />
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-line">
+    <div class="mx-auto max-w-[1440px] px-5 py-8 md:px-10">
+      <slot name="footer" />
+    </div>
+  </footer>
+</BaseLayout>
+
+<style>
+  /* ---------- Identidad (nombre + toggle) ----------
+     display: contents hace que el div "desaparezca" del layout: sus hijos
+     se comportan como hijos directos de .stage, así el toggle sticky sigue
+     funcionando a lo largo de los paneles. */
+  .identity { display: contents; }
+
+  /* El nombre y el toggle se animan entre arriba y el centro al cambiar de vista */
+  .hero { view-transition-name: hero; }
+  .toggle-dock { view-transition-name: toggle; }
+
+  .stage { position: relative; }
+
+  /* Desktop grande + vista dual: el bloque flota en el centro, encima del divisor */
+  @media (min-width: 1200px) {
+    :global(html[data-view='design']) .identity {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      translate: -50% -50%;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: max-content;
+      pointer-events: none; /* deja pasar el mouse a las piezas de abajo (el toggle lo reactiva en .toggle-dock) */
+    }
+    :global(html[data-view='design']) .hero { padding: 0; }
+    :global(html[data-view='design']) .toggle-dock {
+      position: static;
+      padding: 1.5rem 0 0;
+    }
+  }
+
+  /* ---------- Toggle fijo ---------- */
+  .toggle-dock {
+    position: sticky;
+    top: 0.75rem;
+    z-index: 30;
+    display: flex;
+    justify-content: center;
+    padding-bottom: 1.5rem;
+    pointer-events: none; /* el contenedor no bloquea clics… */
+  }
+  .toggle-dock > :global(*) { pointer-events: auto; } /* …pero el toggle sí */
+
+  /* ---------- Split: MOBILE FIRST (una columna) ---------- */
+  .split {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .pane { min-width: 0; view-transition-name: var(--vt-name); }
+  .pane--content { --vt-name: pane-content; }
+  .pane--code { --vt-name: pane-code; }
+
+  .pane-body { padding: 2rem 1.25rem 3rem; }
+
+  .divider { height: 1px; background: var(--color-line); }
+
+  /* El riel solo existe en desktop */
+  .rail { display: none; }
+
+  /* ---------- Design: panel de abajo ----------
+     Oculto por defecto; en modo design aparece debajo del split, centrado
+     (Design es el botón del medio del toggle) */
+  .pane--design {
+    display: none;
+    border-top: 1px solid var(--color-line);
+    text-align: center;
+    view-transition-name: pane-design;
+  }
+  :global(html[data-view='design']) .pane--design { display: block; }
+
+  /* Mobile: en modo "content" o "code" se oculta el otro panel */
+  :global(html[data-view='content']) .pane--code,
+  :global(html[data-view='content']) .divider,
+  :global(html[data-view='code']) .pane--content,
+  :global(html[data-view='code']) .divider {
+    display: none;
+  }
+
+  /* ---------- Split: DESKTOP (lado a lado) ---------- */
+  @media (min-width: 900px) {
+    .split {
+      --left: 1fr;
+      --right: 1fr;
+      grid-template-columns: var(--left) 1px var(--right);
+      min-height: 70dvh;
+      /* Las columnas de grid se pueden animar en navegadores modernos */
+      transition: grid-template-columns 0.5s var(--ease-out-soft);
+    }
+
+    .divider { height: auto; width: 1px; }
+    .pane-body { padding: 2.5rem clamp(1.5rem, 4vw, 3.75rem) 2rem; }
+
+    /* Vista dual: el split ocupa la pantalla (menos el header) y cada panel
+       reparte sus hijos: título arriba, piezas al medio, etiqueta abajo */
+    :global(html[data-view='design']) .split { min-height: calc(100dvh - 4rem); }
+    :global(html[data-view='design']) .pane { display: flex; flex-direction: column; }
+    :global(html[data-view='design']) .pane-body {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 2.5rem;
+    }
+
+    /* En desktop ningún panel desaparece: el que pierde foco se vuelve un riel */
+    :global(html[data-view='content']) .pane--code,
+    :global(html[data-view='code']) .pane--content,
+    :global(html[data-view]) .divider {
+      display: block;
+    }
+
+    :global(html[data-view='content']) .split { --left: 1fr; --right: 4.5rem; }
+    :global(html[data-view='code']) .split { --left: 4.5rem; --right: 1fr; }
+
+    /* Panel colapsado: se oculta su contenido (visibility también lo saca
+       del orden de tabulación y de los lectores de pantalla) y aparece el riel */
+    :global(html[data-view='content']) .pane--code .pane-body,
+    :global(html[data-view='code']) .pane--content .pane-body {
+      visibility: hidden;
+      height: 0;
+      overflow: hidden;
+      padding: 0;
+    }
+
+    :global(html[data-view='content']) .pane--code .rail,
+    :global(html[data-view='code']) .pane--content .rail {
+      display: flex;
+    }
+
+    .rail {
+      position: sticky;
+      top: 5rem;
+      width: 100%;
+      height: min(60dvh, 28rem);
+      align-items: center;
+      justify-content: center;
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--color-muted);
+      transition: color 0.2s, background-color 0.2s;
+    }
+    .rail span { writing-mode: vertical-rl; transform: rotate(180deg); }
+    .rail:hover { color: var(--color-ink); background: var(--color-accent-soft); }
+  }
+</style>
+
+<script>
+  // Reloj del header: hora de Buenos Aires, se actualiza cada 30 segundos
+  const clock = document.querySelector<HTMLTimeElement>('[data-clock]');
+  const formatTime = new Intl.DateTimeFormat('es-AR', {
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Argentina/Buenos_Aires',
+  });
+  const tick = () => {
+    if (clock) clock.textContent = formatTime.format(new Date());
+  };
+  tick();
+  setInterval(tick, 30_000);
+
+  // Los rieles laterales vuelven a la vista Design (dual) "clickeando" el radio del toggle,
+  // así toda la lógica de estado sigue viviendo en un solo lugar (ViewToggle).
+  document.querySelectorAll<HTMLButtonElement>('[data-rail]').forEach((rail) => {
+    rail.addEventListener('click', () => {
+      document.querySelector<HTMLInputElement>('[data-view-toggle] input[value="design"]')?.click();
+    });
+  });
+</script>

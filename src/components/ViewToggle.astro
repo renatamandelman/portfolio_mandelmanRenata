@@ -1,0 +1,207 @@
+---
+/**
+ * ViewToggle — Segmented control [ CONTENT ⇄ DESIGN ⇄ CODE ]
+ *
+ * Responsabilidad: definir el MODO DE LECTURA de toda la experiencia.
+ *   - "content" → foco en Creación de Contenido / RRSS
+ *   - "design"  → vista inicial: dual Content | Code + diseño gráfico y UX/UI abajo
+ *   - "code"    → foco en Desarrollo Web
+ * Las flechas ⇄ son decorativas (aria-hidden): solo separan las opciones.
+ *
+ * Cómo funciona:
+ *   1. Son <input type="radio"> nativos → accesibles por defecto
+ *      (Tab para entrar, flechas ← → para cambiar, lectores de pantalla los anuncian).
+ *   2. Al cambiar, se escribe el estado en <html data-view="...">.
+ *      El CSS de SplitLayout reacciona a ese atributo (una sola fuente de verdad).
+ *   3. Se guarda en localStorage para recordar la preferencia.
+ *   4. Se emite el evento "viewchange" para que otros componentes puedan escuchar.
+ */
+
+type View = 'content' | 'design' | 'code';
+
+interface Props {
+  /** Vista inicial si no hay nada guardado */
+  initial?: View;
+  /** id único por si se usa más de un toggle en la página */
+  id?: string;
+}
+
+const { initial = 'design', id = 'view-toggle' } = Astro.props;
+
+const options: { value: View; label: string; srLabel: string }[] = [
+  { value: 'content', label: 'Content', srLabel: 'Ver solo creación de contenido' },
+  { value: 'design', label: 'Design', srLabel: 'Ver todo: contenido, código y diseño' },
+  { value: 'code', label: 'Code', srLabel: 'Ver solo desarrollo web' },
+];
+---
+
+<fieldset class="view-toggle" id={id} data-view-toggle>
+  <legend class="sr-only">Modo de lectura del portfolio</legend>
+
+  <span class="bracket" aria-hidden="true">[</span>
+
+  <div class="track">
+    <!-- "Pastilla" que se desliza detrás de la opción activa -->
+    <span class="thumb" aria-hidden="true"></span>
+
+    {
+      options.map((opt, i) => (
+        <>
+        {/* Flecha decorativa entre opciones (no antes de la primera) */}
+        {i > 0 && <span class="arrow" aria-hidden="true">⇄</span>}
+        <label class="option" data-option={opt.value}>
+          <input
+            type="radio"
+            name={`${id}-view`}
+            value={opt.value}
+            checked={opt.value === initial}
+            class="sr-only"
+          />
+          <span aria-hidden="true">{opt.label}</span>
+          <span class="sr-only">{opt.srLabel}</span>
+        </label>
+        </>
+      ))
+    }
+  </div>
+
+  <span class="bracket" aria-hidden="true">]</span>
+
+  <!-- Anuncia el cambio a lectores de pantalla -->
+  <p class="sr-only" aria-live="polite" data-view-status></p>
+</fieldset>
+
+<style>
+  .view-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: color-mix(in srgb, var(--color-surface) 85%, transparent);
+    backdrop-filter: blur(10px);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 8px 24px -12px rgb(24 24 27 / 0.18);
+  }
+
+  .bracket,
+  .arrow { color: var(--color-muted); }
+  .arrow { padding-inline: 0.15rem; }
+
+  .track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(5, auto); /* 3 opciones + 2 flechas */
+    align-items: center;
+  }
+
+  .option {
+    position: relative;
+    z-index: 1;
+    padding: 0.4rem 0.85rem;
+    border-radius: var(--radius-pill);
+    color: var(--color-muted);
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.25s var(--ease-out-soft);
+    user-select: none;
+  }
+  .option:hover { color: var(--color-ink); }
+
+  /* Opción activa: texto oscuro sobre la pastilla */
+  .option:has(input:checked) { color: var(--color-ink); font-weight: 500; }
+
+  /* Foco por teclado: el input está oculto, así que el anillo va en el label */
+  .option:has(input:focus-visible) {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 2px;
+  }
+
+  /* Pastilla deslizante: se posiciona con variables que setea el script */
+  .thumb {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: var(--thumb-x, 0px);
+    width: var(--thumb-w, 0px);
+    border-radius: var(--radius-pill);
+    background: var(--color-accent);
+    transition:
+      left 0.35s var(--ease-out-soft),
+      width 0.35s var(--ease-out-soft);
+  }
+</style>
+
+<script>
+  type View = 'content' | 'design' | 'code';
+
+  const STORAGE_KEY = 'rm-view';
+  const MESSAGES: Record<View, string> = {
+    content: 'Vista: creación de contenido',
+    design: 'Vista: contenido, código y diseño',
+    code: 'Vista: desarrollo web',
+  };
+
+  function setView(view: View) {
+    const root = document.documentElement;
+    if (root.dataset.view === view) return;
+
+    const apply = () => {
+      root.dataset.view = view;
+    };
+
+    // View Transitions API: anima el cambio de layout si el navegador lo soporta.
+    // Si no (o si el usuario prefiere menos movimiento), cambia directo.
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if ('startViewTransition' in document && !reduceMotion) {
+      document.startViewTransition(apply);
+    } else {
+      apply();
+    }
+
+    try { localStorage.setItem(STORAGE_KEY, view); } catch (_) {}
+    document.dispatchEvent(new CustomEvent('viewchange', { detail: { view } }));
+  }
+
+  function initToggle(toggle: HTMLElement) {
+    const thumb = toggle.querySelector<HTMLElement>('.thumb')!;
+    const status = toggle.querySelector<HTMLElement>('[data-view-status]')!;
+    const inputs = toggle.querySelectorAll<HTMLInputElement>('input[type="radio"]');
+
+    // Mueve la pastilla debajo de la opción marcada
+    const moveThumb = () => {
+      const checked = toggle.querySelector<HTMLInputElement>('input:checked');
+      const label = checked?.closest<HTMLElement>('.option');
+      if (!label) return;
+      thumb.style.setProperty('--thumb-x', `${label.offsetLeft}px`);
+      thumb.style.setProperty('--thumb-w', `${label.offsetWidth}px`);
+    };
+
+    // Sincroniza el radio con la vista actual (la que restauró BaseLayout)
+    const current = (document.documentElement.dataset.view as View) || 'design';
+    inputs.forEach((input) => { input.checked = input.value === current; });
+    moveThumb();
+
+    inputs.forEach((input) => {
+      input.addEventListener('change', () => {
+        const view = input.value as View;
+        setView(view);
+        moveThumb();
+        status.textContent = MESSAGES[view];
+      });
+    });
+
+    // Si cambia el tamaño (ej: rotar el celular), recalcula la pastilla
+    new ResizeObserver(moveThumb).observe(toggle);
+
+    // Cuando terminan de cargar las fuentes cambian los anchos de los labels:
+    // hay que volver a medir (si no, la pastilla queda corrida)
+    document.fonts.ready.then(moveThumb);
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-view-toggle]').forEach(initToggle);
+</script>

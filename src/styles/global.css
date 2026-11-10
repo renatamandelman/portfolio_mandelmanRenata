@@ -1,0 +1,103 @@
+/* ==========================================================================
+   global.css — Design tokens + estilos base del portfolio
+   Tailwind v4: los tokens se declaran en @theme y generan utilidades
+   automáticamente (ej: --color-accent → bg-accent, text-accent, border-accent).
+   ========================================================================== */
+
+@import 'tailwindcss';
+
+/* Fuentes autoalojadas (sin depender de Google Fonts → mejor performance y privacidad) */
+@import '@fontsource-variable/inter';
+@import '@fontsource/jetbrains-mono/400.css';
+@import '@fontsource/jetbrains-mono/500.css';
+
+@theme {
+  /* --- Color --------------------------------------------------------------- */
+  --color-cream: #faf9f6;        /* fondo general */
+  --color-surface: #ffffff;      /* tarjetas bento */
+  --color-ink: #18181b;          /* texto principal (contraste 16.8:1 sobre cream) */
+  --color-muted: #71717a;        /* texto secundario (4.6:1 → pasa AA) */
+  --color-line: #e4e4e7;         /* bordes 1px */
+  --color-accent: #e09f93;       /* salmón: SOLO fondos, bordes, decoración (2.1:1, no apto texto) */
+  --color-accent-soft: #f6e3df;  /* fondo suave para badges / hover */
+  --color-accent-ink: #9a4e42;   /* salmón oscuro para texto/links (5.6:1 → pasa AA) */
+  --color-dot-red: #ff5f57;      /* "semáforo" de la ventana del editor (decorativo) */
+  --color-dot-yellow: #febc2e;
+  --color-dot-green: #28c840;
+
+  /* --- Tipografía ---------------------------------------------------------- */
+  --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+
+  /* --- Bento --------------------------------------------------------------- */
+  --radius-bento: 1.25rem;
+  --radius-pill: 999px;
+
+  /* --- Motion -------------------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* --------------------------------------------------------------------------
+   Base
+   -------------------------------------------------------------------------- */
+@layer base {
+  html {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    scroll-behavior: smooth;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-ink);
+  }
+
+  /* Foco visible y consistente para navegación por teclado */
+  :focus-visible {
+    outline: 2px solid var(--color-ink);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+/* --------------------------------------------------------------------------
+   Componentes reutilizables
+   -------------------------------------------------------------------------- */
+@layer components {
+  /* Tarjeta bento base: la usan ProjectCard, stats, widgets */
+  .bento {
+    background-color: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-bento);
+  }
+
+  /* Etiqueta chica en mayúsculas (subtítulos de sección) */
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+}
+
+/* Utilidad: oculta visualmente pero mantiene el texto para lectores de pantalla */
+@utility sr-only-focusable {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  &:focus { position: static; width: auto; height: auto; clip: auto; }
+}
