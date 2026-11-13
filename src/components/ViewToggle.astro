@@ -4,7 +4,9 @@
  *
  * Responsabilidad: definir el MODO DE LECTURA de toda la experiencia.
  *   - "content" → foco en Creación de Contenido / RRSS
- *   - "design"  → vista inicial: dual Content | Code + diseño gráfico y UX/UI abajo
+ *   - "design"  → foco en Diseño gráfico / UX-UI
+ * Al entrar, <html data-view="all"> (las tres columnas) y no hay ninguna opción marcada:
+ * la pastilla aparece recién cuando se elige una.
  *   - "code"    → foco en Desarrollo Web
  * Las flechas ⇄ son decorativas (aria-hidden): solo separan las opciones.
  *
@@ -20,17 +22,17 @@
 type View = 'content' | 'design' | 'code';
 
 interface Props {
-  /** Vista inicial si no hay nada guardado */
+  /** Opción marcada al cargar (por defecto ninguna: la vista inicial es "all") */
   initial?: View;
   /** id único por si se usa más de un toggle en la página */
   id?: string;
 }
 
-const { initial = 'design', id = 'view-toggle' } = Astro.props;
+const { initial, id = 'view-toggle' } = Astro.props;
 
 const options: { value: View; label: string; srLabel: string }[] = [
   { value: 'content', label: 'Content', srLabel: 'Ver solo creación de contenido' },
-  { value: 'design', label: 'Design', srLabel: 'Ver todo: contenido, código y diseño' },
+  { value: 'design', label: 'Design', srLabel: 'Ver solo diseño gráfico y UX/UI' },
   { value: 'code', label: 'Code', srLabel: 'Ver solo desarrollo web' },
 ];
 ---
@@ -142,7 +144,7 @@ const options: { value: View; label: string; srLabel: string }[] = [
   const STORAGE_KEY = 'rm-view';
   const MESSAGES: Record<View, string> = {
     content: 'Vista: creación de contenido',
-    design: 'Vista: contenido, código y diseño',
+    design: 'Vista: diseño gráfico y UX/UI',
     code: 'Vista: desarrollo web',
   };
 
@@ -181,8 +183,9 @@ const options: { value: View; label: string; srLabel: string }[] = [
       thumb.style.setProperty('--thumb-w', `${label.offsetWidth}px`);
     };
 
-    // Sincroniza el radio con la vista actual (la que restauró BaseLayout)
-    const current = (document.documentElement.dataset.view as View) || 'design';
+    // Sincroniza el radio con la vista actual (la que restauró BaseLayout).
+    // Si es "all" ningún radio coincide: quedan todos sin marcar y la pastilla no se ve.
+    const current = document.documentElement.dataset.view;
     inputs.forEach((input) => { input.checked = input.value === current; });
     moveThumb();
 

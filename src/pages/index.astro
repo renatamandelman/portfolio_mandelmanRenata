@@ -2,11 +2,18 @@
 /**
  * index.astro — Página principal.
  * Arma la experiencia: llena los slots de SplitLayout con los datos de profile.ts.
+ *
+ * Cada panel tiene dos partes:
+ *   imagen → siempre visible (celular, frame de diseño, editor)
+ *   .more  → los proyectos de esa área: solo al tocar Content, Design o Code
+ *            (lo decide el CSS de SplitLayout según <html data-view>)
+ *
  * Las marcas del lado content son <ProjectCard /> (botón + modal con videos).
- * Pendiente: ProjectCard del lado code y <DynamicApiWidget /> en el footer.
+ * En el panel Code, <DynamicApiWidget /> muestra los proyectos web (profile.ts + API de GitHub) en una sola lista.
  */
 import SplitLayout from '../layouts/SplitLayout.astro';
 import ProjectCard from '../components/ProjectCard.astro';
+import DynamicApiWidget from '../components/DynamicApiWidget.astro';
 import { embedUrl } from '../utils/embed';
 import {
   profile,
@@ -16,328 +23,403 @@ import {
   engagement,
   socials,
   projects,
-  motionProject,
   designWork,
   designCategories,
 } from '../data/profile';
 
 const contentWork = experiences.filter((e) => e.side === 'content');
 
+// Proyecto de diseño destacado para la portada (el primero con featured: true)
+const featuredWork = designWork.find((work) => work.featured);
+
 // Video del celular: se busca por id entre los videos de todas las experiencias
 const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src === profile.heroVideo);
+
+// Paleta de la portada de Design: son los tokens reales del sitio (global.css)
+const palette = [
+  { name: 'Ink', className: 'bg-ink' },
+  { name: 'Accent', className: 'bg-accent' },
+  { name: 'Soft', className: 'bg-accent-soft' },
+  { name: 'Deep', className: 'bg-accent-ink' },
+  { name: 'Cream', className: 'bg-cream' },
+];
 ---
 
 <SplitLayout>
   <!-- ============ HERO ============ -->
-  <!-- En desktop grande, SplitLayout hace flotar este bloque en el centro del split -->
+  <!-- Nombre + rol. En la portada (desktop) SplitLayout lo hace flotar arriba al centro -->
   <Fragment slot="hero">
-    <p class="mb-4 inline-block rounded-full border border-line bg-cream px-4 py-1 text-xs text-muted">
-      {profile.heroBadge}
-    </p>
     <h1
-      class="text-5xl leading-[0.88] font-black tracking-tight uppercase md:text-6xl lg:text-[76px] xl:text-[clamp(5rem,6.5vw,6.5rem)]"
+      class="text-4xl leading-[0.92] font-black tracking-tight uppercase md:text-5xl xl:text-[3.375rem]"
     >
-      Renata<br />Mandelman
+      <!-- En mobile el nombre va en dos líneas; desde md, en una -->
+      Renata <br class="md:hidden" />Mandelman
     </h1>
-    <p class="mt-4 text-xs font-bold tracking-wider uppercase">
+    <p class="mt-3 text-[11px] font-bold tracking-wider uppercase">
       {profile.tagline}
     </p>
   </Fragment>
 
   <!-- ============ PANEL CONTENT ============ -->
   <Fragment slot="content">
-    <header class="mb-8" id="sobre-mi">
+    <header>
       <h2
         id="pane-content-title"
-        class="text-2xl leading-snug font-extrabold tracking-tight uppercase lg:text-[28px]"
+        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
       >
         Creación de contenido / RRSS
       </h2>
       <p class="eyebrow mt-1">Diseño multimedial, desarrollo y RRSS</p>
     </header>
 
-    <!-- @container: la grilla se acomoda según el ancho del PANEL, no de la pantalla
-         (el panel cambia de ancho con el toggle aunque la pantalla no cambie) -->
-    <div class="@container max-w-xl">
-      <div class="grid gap-3 @md:grid-cols-[5fr_7fr]">
-        <!-- Columna izquierda: video + métricas + engagement -->
-        <div class="flex flex-col gap-3">
-          <!-- Animación destacada: link al proyecto en Behance -->
-          <a
-            href={motionProject.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="group relative block aspect-[4/3] overflow-hidden rounded-2xl bg-linear-to-br from-accent-ink to-ink"
+    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
+         Panel angosto (inicio, mobile) → uno debajo del otro.
+         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <div class="@container">
+      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
+        <!-- IMAGEN: métricas + engagement a la izquierda, celular a la derecha (grilla de 12 columnas) -->
+        <div class="mx-auto my-6 grid w-full max-w-md grid-cols-12 items-start gap-2.5">
+          <!-- Celular con Reels: muestra heroVideo. El reproductor de TikTok se carga
+               recién al tocar play (lo agrega el script de abajo). -->
+          <div
+            class="relative col-span-7 row-span-2 mx-auto aspect-[9/16] w-full max-w-[190px] overflow-hidden rounded-2xl border-2 border-surface bg-linear-to-b from-accent to-ink shadow-xl"
+            data-hero-video={heroVideo && embedUrl(heroVideo, true)}
+            data-hero-title={heroVideo && `${heroVideo.brand}: ${heroVideo.title}`}
           >
+            {heroVideo?.poster && <img src={heroVideo.poster} alt="" class="absolute inset-0 size-full object-cover" />}
+            <span aria-hidden="true" class="absolute top-2.5 left-2.5 rounded-full bg-ink/40 px-2 py-0.5 text-[9px] font-medium text-cream backdrop-blur">
+              Reels
+            </span>
+            <!-- Acciones laterales: me gusta, comentar, compartir -->
+            <div class="absolute right-2 bottom-10 flex flex-col gap-2 text-cream" aria-hidden="true">
+              <span class="flex size-6 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
+                <svg viewBox="0 0 24 24" class="size-2.5" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" /></svg>
+              </span>
+              <span class="flex size-6 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
+                <svg viewBox="0 0 24 24" class="size-2.5" fill="currentColor"><path d="M4 4h16v12H8l-4 4z" /></svg>
+              </span>
+              <span class="flex size-6 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
+                <svg viewBox="0 0 24 24" class="size-2.5" fill="currentColor"><path d="M3 11l18-8-8 18-2-8z" /></svg>
+              </span>
+            </div>
+            <div class="absolute bottom-2 left-2 rounded-lg bg-ink/40 px-2 py-0.5 text-cream backdrop-blur-sm">
+              <p class="text-[9px] font-bold">{profile.name}</p>
+              {heroVideo && <p class="text-[8px] opacity-80">{heroVideo.brand} · {heroVideo.title}</p>}
+            </div>
             {
-              motionProject.image && (
-                <img src={motionProject.image} alt="" class="absolute inset-0 size-full object-cover transition-transform duration-300 group-hover:scale-105" />
+              heroVideo && (
+                <button
+                  type="button"
+                  class="absolute inset-x-0 top-[30%] mx-auto flex size-11 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-ink shadow-lg transition-transform hover:scale-110"
+                  data-hero-play
+                  aria-label={`Reproducir video de ${heroVideo.brand}: ${heroVideo.title}`}
+                >
+                  <svg viewBox="0 0 24 24" class="ml-1 size-4" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z" /></svg>
+                </button>
               )
             }
-            <span
-              class="absolute inset-0 m-auto flex size-9 items-center justify-center rounded-full bg-surface/90 text-ink transition-transform group-hover:scale-110"
-              aria-hidden="true"
-            >
-              <svg viewBox="0 0 24 24" class="ml-0.5 size-3.5" fill="currentColor"><path d="M7 4v16l13-8z" /></svg>
-            </span>
-            <span class="absolute bottom-2 left-2 rounded-lg bg-ink/60 px-2 py-1 text-cream backdrop-blur-sm">
-              <span class="block text-[10px] font-bold">{motionProject.title}</span>
-              <span class="block font-mono text-[9px] opacity-80">{motionProject.type}</span>
-            </span>
-            <span class="sr-only">(Behance, se abre en otra pestaña)</span>
-          </a>
+          </div>
 
-          <!-- Métricas -->
-          <ul class="grid grid-cols-2 gap-3">
+          <!-- Métricas en 2 x 2 (order-first: en la grilla van antes que el celular, a la izquierda) -->
+          <ul class="order-first col-span-5 grid grid-cols-2 gap-2">
             {
               contentStats.map((stat) => (
-                <li class="bento flex flex-col p-3">
-                  <span class="text-xl font-extrabold tracking-tight">{stat.value}</span>
-                  <span class="text-[10px] font-semibold text-muted uppercase">{stat.label}</span>
+                <li class="bento flex flex-col p-2.5">
+                  <span class="text-base font-extrabold tracking-tight">{stat.value}</span>
+                  <span class="text-[9px] font-semibold text-muted uppercase">{stat.label}</span>
                 </li>
               ))
             }
           </ul>
 
           <!-- Engagement con mini gráfico de barras -->
-          <div class="bento p-3">
+          <div class="bento col-span-5 p-2.5">
             <div class="flex items-center justify-between">
               <div>
-                <span class="block text-[10px] font-bold text-muted uppercase">Engagement</span>
-                <span class="text-sm font-extrabold">{engagement.value}</span>
+                <span class="block text-[8px] font-bold text-muted uppercase">Engagement</span>
+                <span class="text-xs font-extrabold">{engagement.value}</span>
               </div>
-              <span class="rounded-full bg-accent-soft px-1.5 py-0.5 text-[10px] font-bold text-accent-ink">
+              <span class="rounded-full bg-accent-soft px-1.5 py-0.5 text-[9px] font-bold text-accent-ink">
                 {engagement.delta}
               </span>
             </div>
-            <div class="mt-2 flex h-8 items-end gap-1.5 border-t border-line pt-1" aria-hidden="true">
+            <div class="mt-1.5 flex h-6 items-end gap-1 border-t border-line pt-1" aria-hidden="true">
               {engagement.bars.map((h) => <span class="w-full rounded-t-sm bg-accent" style={`height:${h}%`} />)}
             </div>
           </div>
         </div>
 
-        <!-- Celular con Reels: muestra heroVideo. El reproductor de TikTok se carga
-             recién al tocar play (lo agrega el script de abajo). -->
-        <div
-          class="relative mx-auto aspect-[9/16] w-full max-w-[260px] overflow-hidden rounded-3xl border-4 border-surface bg-linear-to-b from-accent to-ink shadow-xl"
-          data-hero-video={heroVideo && embedUrl(heroVideo, true)}
-          data-hero-title={heroVideo && `${heroVideo.brand}: ${heroVideo.title}`}
-        >
-          {heroVideo?.poster && <img src={heroVideo.poster} alt="" class="absolute inset-0 size-full object-cover" />}
-          <span aria-hidden="true" class="absolute top-3 left-3 rounded-full bg-ink/40 px-2 py-1 text-[10px] font-medium text-cream backdrop-blur">
-            Reels
-          </span>
-          <!-- Acciones laterales: me gusta, comentar, compartir -->
-          <div class="absolute right-2.5 bottom-14 flex flex-col gap-3 text-cream" aria-hidden="true">
-            <span class="flex size-7 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
-              <svg viewBox="0 0 24 24" class="size-3" fill="currentColor"><path d="M12 21s-7-4.5-9.5-9A5.5 5.5 0 0 1 12 6a5.5 5.5 0 0 1 9.5 6c-2.5 4.5-9.5 9-9.5 9z" /></svg>
-            </span>
-            <span class="flex size-7 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
-              <svg viewBox="0 0 24 24" class="size-3" fill="currentColor"><path d="M4 4h16v12H8l-4 4z" /></svg>
-            </span>
-            <span class="flex size-7 items-center justify-center rounded-full bg-surface/30 backdrop-blur-sm">
-              <svg viewBox="0 0 24 24" class="size-3" fill="currentColor"><path d="M3 11l18-8-8 18-2-8z" /></svg>
-            </span>
-          </div>
-          <div class="absolute bottom-3 left-3 rounded-lg bg-ink/40 px-2.5 py-1 text-cream backdrop-blur-sm">
-            <p class="text-[10px] font-bold">{profile.name}</p>
-            {heroVideo && <p class="text-[9px] opacity-80">{heroVideo.brand} · {heroVideo.title}</p>}
-          </div>
-          {
-            heroVideo && (
-              <button
-                type="button"
-                class="absolute inset-x-0 top-[28%] mx-auto flex size-14 cursor-pointer items-center justify-center rounded-full bg-surface/90 text-ink shadow-lg transition-transform hover:scale-110"
-                data-hero-play
-                aria-label={`Reproducir video de ${heroVideo.brand}: ${heroVideo.title}`}
-              >
-                <svg viewBox="0 0 24 24" class="ml-1 size-5" fill="currentColor" aria-hidden="true"><path d="M7 4v16l13-8z" /></svg>
-              </button>
-            )
-          }
+        <!-- PROYECTOS (vista Content): marcas con las que trabajé, cada una abre su modal con tareas y videos.
+             @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla -->
+        <div class="more @container my-8">
+          <ul class="grid grid-cols-2 gap-3 @2xl:grid-cols-4" id="experiencia">
+            {contentWork.map((job) => <ProjectCard job={job} />)}
+          </ul>
         </div>
       </div>
-
-      <!-- Marcas con las que trabajé: cada una abre su modal con tareas y videos -->
-      <ul class="mt-3 grid grid-cols-2 gap-3 @md:grid-cols-4" id="experiencia">
-        {contentWork.map((job) => <ProjectCard job={job} />)}
-      </ul>
     </div>
 
     <!-- Etiqueta de cierre del panel -->
-    <div class="mt-10">
-      <p class="flex flex-wrap items-center gap-2">
-        <span class="text-xl font-black tracking-tight uppercase">Creative Lab</span>
-        <span class="rounded-md bg-ink px-2 py-0.5 text-[10px] font-bold text-cream uppercase">/ Social media content</span>
-      </p>
+    <p class="flex flex-wrap items-center gap-2 border-t border-line pt-3">
+      <span class="text-base font-black tracking-tight uppercase">Creative Lab</span>
+      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">/ Social media</span>
+    </p>
+  </Fragment>
+
+  <!-- ============ PANEL DESIGN ============ -->
+  <!-- Columna del medio: Design, igual que el botón del medio del toggle -->
+  <Fragment slot="design">
+    <header>
+      <h2
+        id="pane-design-title"
+        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
+      >
+        Diseño gráfico / UX-UI
+      </h2>
+      <p class="eyebrow mt-1">Identidad · Piezas · Interfaces · Motion</p>
+    </header>
+
+    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
+         Panel angosto (inicio, mobile) → uno debajo del otro.
+         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <div class="@container">
+      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
+        <!-- IMAGEN: un "frame" tipo Figma con el proyecto destacado, la tipografía y la paleta del sitio -->
+        <div class="mx-auto my-6 flex w-full max-w-md flex-col gap-2.5 text-left">
+          <figure class="bento p-3 shadow-md">
+            <figcaption class="mb-2 flex items-center justify-between gap-2 border-b border-line pb-2">
+              <span class="flex items-center gap-2 truncate">
+                <span class="font-mono text-[11px] font-bold text-accent-ink">FIGMA</span>
+                <span class="truncate text-[11px] font-bold">{featuredWork?.title ?? 'Portfolio'}</span>
+              </span>
+              <span class="shrink-0 rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold text-muted uppercase">
+                {designWork.length} proyectos
+              </span>
+            </figcaption>
+
+            <div class="grid grid-cols-12 items-center gap-2.5">
+              <!-- Proyecto destacado (featured: true en profile.ts) -->
+              {
+                featuredWork && (
+                  <a
+                    href={featuredWork.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="group col-span-5 block aspect-[9/14] overflow-hidden rounded-xl bg-linear-to-br from-accent-soft to-accent"
+                  >
+                    {featuredWork.image && (
+                      <img src={featuredWork.image} alt="" class="size-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                    )}
+                    <span class="sr-only">{featuredWork.title} (Behance, se abre en otra pestaña)</span>
+                  </a>
+                )
+              }
+
+              <div class="col-span-7 flex flex-col gap-2">
+                <!-- Tipografía del sitio -->
+                <div class="rounded-xl border border-line bg-cream p-2">
+                  <span class="block text-[8px] font-bold tracking-wider text-muted uppercase">Type scale</span>
+                  <span class="mt-0.5 flex items-baseline gap-1.5">
+                    <span class="text-sm font-black">Aa</span>
+                    <span class="text-[10px] font-bold">Inter</span>
+                    <span class="font-mono text-[8px] text-muted">+ JetBrains Mono</span>
+                  </span>
+                </div>
+                <!-- Paleta: muestras de los tokens de global.css -->
+                <div class="rounded-xl border border-line bg-cream p-2">
+                  <span class="mb-1 block text-[8px] font-bold tracking-wider text-muted uppercase">Palette tokens</span>
+                  <ul class="flex gap-1.5">
+                    {
+                      palette.map((color) => (
+                        <li class="flex flex-col items-center">
+                          <span class={`block size-5 rounded-md border border-line ${color.className}`} aria-hidden="true" />
+                          <span class="mt-0.5 font-mono text-[7px] text-muted">{color.name}</span>
+                        </li>
+                      ))
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </figure>
+
+          <!-- Categorías con su cantidad de trabajos -->
+          <ul class="flex gap-2">
+            {
+              designCategories.map((category) => (
+                <li class="bento flex-1 px-2.5 py-2">
+                  <span class="block truncate text-[11px] font-bold">{category}</span>
+                  <span class="font-mono text-[9px] text-muted">
+                    {designWork.filter((work) => work.category === category).length} trabajos
+                  </span>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+
+        <!-- PROYECTOS (vista Design). Filas por categoría.
+             @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla.
+             Panel angosto → carrusel; @sm → 2 columnas; @3xl (panel ancho) → categoría a la izquierda + 3 columnas -->
+        <!-- w-full: un @container no mide su contenido; sin ancho fijo, dentro de la grilla quedaba en 0px -->
+        <div class="more @container mx-auto my-8 w-full max-w-5xl text-left">
+        {
+          designCategories.map((category) => {
+            // Trabajos de esta categoría; si no hay ninguno, no se dibuja la fila
+            const works = designWork.filter((work) => work.category === category);
+            return (
+              works.length > 0 && (
+                <section
+                  class="border-t border-line py-6 @3xl:grid @3xl:grid-cols-[9rem_1fr] @3xl:gap-8"
+                  aria-labelledby={`design-${category}`}
+                >
+                  <h3 id={`design-${category}`} class="eyebrow mb-4 flex items-baseline gap-2 @3xl:mb-0">
+                    {category}
+                    {/* Cantidad de trabajos con dos dígitos: 2 → "02" */}
+                    <span class="font-mono text-[11px]">{String(works.length).padStart(2, '0')}</span>
+                  </h3>
+                  {/* Panel angosto (mobile): carrusel horizontal (scroll-snap) que llega hasta el borde */}
+                  <ul class="-mx-6 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 pb-2 @sm:mx-0 @sm:grid @sm:grid-cols-2 @sm:gap-4 @sm:overflow-visible @sm:px-0 @sm:pb-0 @3xl:grid-cols-3">
+                    {works.map((work) => (
+                      <li class="w-[70%] shrink-0 snap-start @sm:w-auto">
+                        <a
+                          href={work.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          class="bento group relative block h-full overflow-hidden transition-colors hover:border-accent"
+                        >
+                          {/* relative: el texto sr-only (que es absolute) queda dentro de la tarjeta;
+                              sin esto se ubicaba respecto de la página y la ensanchaba en mobile */}
+                          {/* Portada: imagen si hay, si no un degradé con la inicial */}
+                          <div class="relative aspect-[4/3] overflow-hidden bg-linear-to-br from-accent-soft to-accent">
+                            {work.image ? (
+                              <img src={work.image} alt="" class="size-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                            ) : (
+                              <span class="absolute inset-0 grid place-items-center text-5xl font-black text-accent-ink/40" aria-hidden="true">
+                                {work.title.charAt(0)}
+                              </span>
+                            )}
+                          </div>
+                          <div class="flex items-start justify-between gap-3 p-3 text-left">
+                            <span>
+                              <span class="block font-mono text-[11px] text-muted">{work.type}</span>
+                              <span class="block text-sm font-bold">{work.title}</span>
+                            </span>
+                            <span aria-hidden="true" class="text-lg transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+                            <span class="sr-only">(se abre en otra pestaña)</span>
+                          </div>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              )
+            );
+          })
+        }
+        </div>
+      </div>
     </div>
+
+    <!-- Etiqueta de cierre del panel -->
+    <p class="flex flex-wrap items-center justify-center gap-2 border-t border-line pt-3">
+      <span class="text-base font-black tracking-tight uppercase">Diseño UI/UX</span>
+      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">/ Brand identity</span>
+    </p>
   </Fragment>
 
   <!-- ============ PANEL CODE ============ -->
   <Fragment slot="code">
-    <header class="mb-8 md:text-right" id="proyectos">
+    <header class="md:text-right" id="proyectos">
       <h2
         id="pane-code-title"
-        class="text-2xl leading-snug font-extrabold tracking-tight uppercase lg:text-[28px]"
+        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
       >
         Desarrollo web / Code
       </h2>
       <p class="eyebrow mt-1">Developer</p>
     </header>
 
-    <!-- Editor + stack van juntos: son "las piezas del medio" del panel -->
-    <div>
-      <!-- Editor decorativo, inclinado en 3D (ver .tilt abajo) -->
-      <figure class="tilt bento ml-auto max-w-2xl overflow-hidden text-left shadow-2xl" aria-label="Fragmento de código de ejemplo">
-        <!-- Barra superior: semáforo + pestañas -->
-        <div class="flex items-center gap-4 border-b border-line bg-cream px-4 py-2.5">
-          <div class="flex gap-2" aria-hidden="true">
-            <span class="size-2.5 rounded-full bg-dot-red"></span>
-            <span class="size-2.5 rounded-full bg-dot-yellow"></span>
-            <span class="size-2.5 rounded-full bg-dot-green"></span>
-          </div>
-          <span class="rounded-md border border-line bg-surface px-3 py-1 font-mono text-[11px]">renata.config.js</span>
-          <span class="hidden font-mono text-[11px] text-muted sm:inline">ViewToggle.astro</span>
+    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
+         Panel angosto (inicio, mobile) → uno debajo del otro.
+         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <div class="@container">
+      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
+        <!-- IMAGEN: editor decorativo + stack en pastillas -->
+        <div class="mx-auto my-6 w-full max-w-md">
+          <!-- Editor inclinado en 3D (ver .tilt abajo) -->
+          <figure class="tilt bento overflow-hidden text-left shadow-xl" aria-label="Fragmento de código de ejemplo">
+            <!-- Barra superior: semáforo + pestañas -->
+            <div class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2">
+              <div class="flex gap-1.5" aria-hidden="true">
+                <span class="size-2 rounded-full bg-dot-red"></span>
+                <span class="size-2 rounded-full bg-dot-yellow"></span>
+                <span class="size-2 rounded-full bg-dot-green"></span>
+              </div>
+              <span class="rounded-md border border-line bg-surface px-2.5 py-0.5 font-mono text-[10px]">renata.config.js</span>
+            </div>
+
+            <!-- Cada .ln es una línea; el número lo pone el CSS con un contador -->
+            <div class="code overflow-x-auto p-3.5 font-mono text-[10.5px] leading-relaxed">
+              <span class="ln text-muted">// Una sola fuente de verdad para la vista</span>
+              <span class="ln"><span class="text-accent-ink">const</span> renata = {'{'}</span>
+              <span class="ln pl-4">role: <span class="text-muted">'frontend + multimedia'</span>,</span>
+              <span class="ln pl-4">stack: [{stack.code.slice(0, 3).map((s, i) => <><span class="text-muted">'{s}'</span>{i < 2 ? ', ' : ''}</>)}],</span>
+              <span class="ln">{'};'}</span>
+              <span class="ln"></span>
+              <span class="ln"><span class="text-accent-ink">function</span> setView(view) {'{'}</span>
+              <span class="ln pl-4">document.documentElement.dataset.view = view;</span>
+              <span class="ln">{'}'}</span>
+            </div>
+
+            <!-- Barra de estado -->
+            <div class="flex justify-between border-t border-line bg-cream px-3.5 py-1 font-mono text-[9px] text-muted">
+              <span>UTF-8 • JavaScript</span>
+              <span>Git (main)</span>
+            </div>
+          </figure>
+
+          <!-- Stack técnico en pastillas -->
+          <ul class="mt-4 flex flex-wrap justify-center gap-2" aria-label="Stack técnico">
+            {
+              stack.code.map((tech) => (
+                <li class="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[11px] font-medium shadow-sm">{tech}</li>
+              ))
+            }
+          </ul>
         </div>
 
-        <!-- Cada .ln es una línea; el número lo pone el CSS con un contador -->
-        <div class="code overflow-x-auto p-4 font-mono text-[11.5px] leading-relaxed">
-          <span class="ln text-muted">// Una sola fuente de verdad para la vista</span>
-          <span class="ln"><span class="text-accent-ink">const</span> renata = {'{'}</span>
-          <span class="ln pl-4">role: <span class="text-muted">'frontend + multimedia'</span>,</span>
-          <span class="ln pl-4">stack: [{stack.code.slice(0, 4).map((s, i) => <><span class="text-muted">'{s}'</span>{i < 3 ? ', ' : ''}</>)}],</span>
-          <span class="ln pl-4">basedIn: <span class="text-muted">'Buenos Aires'</span>,</span>
-          <span class="ln">{'};'}</span>
-          <span class="ln"></span>
-          <span class="ln"><span class="text-accent-ink">function</span> setView(view) {'{'}</span>
-          <span class="ln pl-4">document.documentElement.dataset.view = view;</span>
-          <span class="ln">{'}'}</span>
+        <!-- PROYECTOS (vista Code): una sola lista con los de profile.ts + los de la API de GitHub -->
+        <div class="more my-8">
+          <DynamicApiWidget user={profile.github} projects={projects} />
         </div>
-
-        <!-- Barra de estado -->
-        <div class="flex justify-between border-t border-line bg-cream px-4 py-1.5 font-mono text-[10px] text-muted">
-          <span>UTF-8 • JavaScript</span>
-          <span>Git (main)</span>
-        </div>
-      </figure>
-
-      <!-- Proyectos publicados: cada tarjeta abre el sitio en otra pestaña.
-           Desde 1200px (cuando el nombre flota) la lista se angosta a la derecha para que no la tape -->
-      <ul class="mt-6 ml-auto grid gap-2 min-[1200px]:max-w-xs" aria-label="Proyectos web">
-        {
-          projects.map((project) => (
-            <li>
-              <a
-                href={project.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                class="bento group flex h-full items-center justify-between gap-4 px-4 py-2.5 text-left transition-colors hover:border-accent"
-              >
-                <span>
-                  <span class="block font-mono text-[11px] text-muted">{project.type}</span>
-                  <span class="block font-bold">{project.title}</span>
-                  {/* new URL(...).hostname saca solo el dominio, sin https:// ni www */}
-                  <span class="block font-mono text-xs text-accent-ink">
-                    {new URL(project.url).hostname.replace('www.', '')}
-                  </span>
-                </span>
-                <span aria-hidden="true" class="text-lg transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
-                <span class="sr-only">(se abre en otra pestaña)</span>
-              </a>
-            </li>
-          ))
-        }
-      </ul>
-
+      </div>
     </div>
-
-    <!-- Cierre del panel: stack + etiqueta (abajo, fuera del área del nombre flotante) -->
-    <div class="mt-10 md:text-right">
-      <!-- Stack técnico en pastillas -->
-      <ul class="mb-5 flex flex-wrap justify-center gap-2 md:justify-end" aria-label="Stack técnico">
-        {
-          stack.code.map((tech) => (
-            <li class="rounded-full border border-line bg-surface px-3 py-1.5 font-mono text-xs font-medium shadow-sm">{tech}</li>
-          ))
-        }
-      </ul>
-      <p class="flex flex-wrap items-center gap-2 md:justify-end">
-        <span class="text-xl font-black tracking-tight uppercase">Desarrollo</span>
-        <span class="rounded-md bg-ink px-2 py-0.5 text-[10px] font-bold text-cream uppercase">Web development</span>
-      </p>
-    </div>
-  </Fragment>
-
-  <!-- ============ PANEL DESIGN ============ -->
-  <!-- Centrado: Content va a la izquierda, Code a la derecha y Design (el botón del medio) al centro -->
-  <Fragment slot="design">
-    <header class="mb-10">
-      <h2
-        id="pane-design-title"
-        class="text-2xl leading-snug font-extrabold tracking-tight uppercase lg:text-[28px]"
-      >
-        Diseño gráfico / UX-UI
-      </h2>
-      <p class="eyebrow mt-1">Identidad · Piezas · Interfaces</p>
-    </header>
-
-    {
-      designCategories.map((category) => {
-        // Trabajos de esta categoría; si no hay ninguno, no se dibuja la sección
-        const works = designWork.filter((work) => work.category === category);
-        return (
-          works.length > 0 && (
-            <section class="mb-12" aria-labelledby={`design-${category}`}>
-              <h3 id={`design-${category}`} class="eyebrow mb-4">{category}</h3>
-              {/* flex-wrap + justify-center: las tarjetas quedan centradas aunque sean pocas */}
-              <ul class="flex flex-wrap justify-center gap-5">
-                {works.map((work) => (
-                  <li class="w-full sm:w-80">
-                    <a
-                      href={work.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      class="bento group block overflow-hidden transition-colors hover:border-accent"
-                    >
-                      {/* Portada: imagen si hay, si no un degradé con la inicial */}
-                      <div class="relative aspect-[4/3] overflow-hidden bg-linear-to-br from-accent-soft to-accent">
-                        {work.image ? (
-                          <img src={work.image} alt="" class="size-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                        ) : (
-                          <span class="absolute inset-0 grid place-items-center text-6xl font-black text-accent-ink/40" aria-hidden="true">
-                            {work.title.charAt(0)}
-                          </span>
-                        )}
-                      </div>
-                      <div class="flex items-center justify-between gap-4 p-4 text-left">
-                        <span>
-                          <span class="block font-mono text-[11px] text-muted">{work.type}</span>
-                          <span class="block font-bold">{work.title}</span>
-                        </span>
-                        <span aria-hidden="true" class="text-lg transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
-                        <span class="sr-only">(se abre en otra pestaña)</span>
-                      </div>
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          )
-        );
-      })
-    }
 
     <!-- Etiqueta de cierre del panel -->
-    <p class="mt-4 flex flex-wrap items-center justify-center gap-2">
-      <span class="text-xl font-black tracking-tight uppercase">Design</span>
-      <span class="rounded-md bg-ink px-2 py-0.5 text-[10px] font-bold text-cream uppercase">Gráfico · UX/UI</span>
+    <p class="flex flex-wrap items-center gap-2 border-t border-line pt-3 md:justify-end">
+      <span class="text-base font-black tracking-tight uppercase">Desarrollo</span>
+      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">Web development</span>
     </p>
+  </Fragment>
+
+  <!-- ============ SOBRE MÍ ============ -->
+  <!-- Desktop: título a la izquierda y texto a la derecha. Mobile: uno debajo del otro -->
+  <Fragment slot="about">
+    <div class="mx-auto grid max-w-5xl gap-6 md:grid-cols-[1fr_2fr] md:gap-12">
+      <div>
+        <h2 id="sobre-mi-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">Sobre mí</h2>
+        <p class="eyebrow mt-1">{profile.location}</p>
+      </div>
+      <div class="max-w-prose space-y-4 leading-relaxed">
+        {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+      </div>
+    </div>
   </Fragment>
 
   <!-- ============ FOOTER ============ -->
   <Fragment slot="footer">
     <div class="flex flex-col gap-4 text-sm text-muted md:flex-row md:items-center md:justify-between">
-      <!-- Acá va <DynamicApiWidget /> (Días 7-8) -->
       <p>© {new Date().getFullYear()} Renata Mandelman. Todos los derechos reservados.</p>
       <ul class="flex gap-6">
         {

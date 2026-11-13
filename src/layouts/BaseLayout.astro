@@ -18,7 +18,7 @@ const {
 ---
 
 <!doctype html>
-<html lang="es" data-view="design">
+<html lang="es" data-view="all">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -32,7 +32,8 @@ const {
 
     <!--
       Se ejecuta ANTES de pintar la página: lee la vista guardada y la aplica
-      a <html data-view>. Evita el "salto" visual de split → code al recargar.
+      a <html data-view>. Evita el "salto" visual de inicio → code al recargar.
+      Sin nada guardado queda "all" (la vista inicial con las tres columnas).
     -->
     <script is:inline>
       try {
@@ -40,7 +41,7 @@ const {
         if (['content', 'design', 'code'].includes(saved)) {
           document.documentElement.dataset.view = saved;
         }
-      } catch (_) { /* localStorage bloqueado: queda "design" por defecto */ }
+      } catch (_) { /* localStorage bloqueado: queda "all" por defecto */ }
     </script>
   </head>
 

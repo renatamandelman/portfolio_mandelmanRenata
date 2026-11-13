@@ -1,0 +1,37 @@
+---
+/**
+ * ProjectLink — Tarjeta de un proyecto web (abre el sitio en otra pestaña).
+ *
+ * Se usa de dos formas:
+ *   1. Con datos: los proyectos de profile.ts (Astro la dibuja al construir el sitio).
+ *   2. Sin datos: como molde dentro de un <template> en DynamicApiWidget.
+ *      El script del widget la copia y completa los data-field con cada repo de GitHub.
+ */
+interface Props {
+  url?: string;
+  type?: string;
+  title?: string;
+}
+
+const { url, type, title } = Astro.props;
+
+// hostname saca solo el dominio, sin https:// ni www
+const host = url ? new URL(url).hostname.replace('www.', '') : '';
+---
+
+<li>
+  <a
+    href={url}
+    target="_blank"
+    rel="noopener noreferrer"
+    class="bento group flex h-full items-center justify-between gap-4 px-4 py-2.5 text-left transition-colors hover:border-accent"
+  >
+    <span>
+      <span data-field="type" class="block font-mono text-[11px] text-muted">{type}</span>
+      <span data-field="title" class="block font-bold">{title}</span>
+      <span data-field="host" class="block font-mono text-xs text-accent-ink">{host}</span>
+    </span>
+    <span aria-hidden="true" class="text-lg transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5">↗</span>
+    <span class="sr-only">(se abre en otra pestaña)</span>
+  </a>
+</li>

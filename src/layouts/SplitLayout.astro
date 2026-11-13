@@ -2,26 +2,26 @@
 /**
  * SplitLayout — Estructura "Dual View" del portfolio.
  *
- * Responsabilidad: organizar la pantalla en dos mundos (Content | Code)
+ * Responsabilidad: organizar la pantalla en tres mundos (Content | Design | Code)
  * y reaccionar al modo elegido en ViewToggle mediante <html data-view>.
  *
  * Slots:
- *   - "hero"    → nombre + bajada (arriba, ocupa todo el ancho)
- *   - "content" → panel izquierdo: Creación de Contenido / RRSS
- *   - "code"    → panel derecho: Desarrollo Web
- *   - "design"  → panel de abajo: Diseño gráfico / UX-UI (solo en modo design)
- *   - "footer"  → acá irá DynamicApiWidget
+ *   - "hero"    → nombre + bajada (arriba, centrado, en todas las vistas)
+ *   - "content" → columna izquierda: Creación de Contenido / RRSS
+ *   - "design"  → columna del medio: Diseño gráfico / UX-UI
+ *   - "code"    → columna derecha: Desarrollo Web
+ *   - "about"   → "Sobre mí", debajo de las columnas (en todas las vistas)
+ *   - "footer"  → copyright y redes
  *
- * Modos (los escribe ViewToggle en <html data-view>):
- *   design (inicio) → vista dual Content | Code + panel Design centrado abajo
- *   content / code  → se ve ese panel solo
- *
- * Comportamiento por tamaño:
- *   Desktop (≥ 900px)  design  → 50 / 50
- *                      content → contenido a pantalla completa + riel lateral "Code"
- *                      code    → al revés
- *   Mobile  (< 900px)  design  → una columna: contenido, código y diseño
- *                      content/code → se muestra solo el panel elegido
+ * Vistas (en <html data-view>):
+ *   all (inicio)            → portada: cada columna muestra solo su "imagen", sin listas de proyectos.
+ *                             Desktop: una pantalla, con el nombre + toggle flotando arriba al centro.
+ *                             Mobile: columnas apiladas.
+ *                             No hay opción marcada en el toggle; se vuelve tocando el nombre del header.
+ *   content / design / code → las escribe ViewToggle.
+ *                             Se ven la imagen y los proyectos de esa área (.more).
+ *                             Desktop: ese panel grande y los otros dos como rieles.
+ *                             Mobile (< 1100px): solo el panel elegido.
  */
 import BaseLayout from './BaseLayout.astro';
 import ViewToggle from '../components/ViewToggle.astro';
@@ -36,14 +36,23 @@ const navLinks = [
   { href: '#sobre-mi', label: 'Sobre mí' },
   { href: '#experiencia', label: 'Experiencia' },
 ];
+
+// Las tres vistas, en el mismo orden que el toggle.
+// Se usan para armar los rieles y los botones "Ver …" de cada panel.
+const views = [
+  { id: 'content', label: 'Content' },
+  { id: 'design', label: 'Design' },
+  { id: 'code', label: 'Code' },
+];
 ---
 
 <BaseLayout {...Astro.props}>
   <header class="site-header border-b border-line">
     <div
-      class="mx-auto flex max-w-[1440px] flex-col items-center gap-3 px-5 py-4 sm:grid sm:grid-cols-[1fr_auto_1fr] md:px-10"
+      class="mx-auto flex max-w-[1440px] flex-col items-center gap-3 px-6 py-4 sm:grid sm:grid-cols-[1fr_auto_1fr] md:px-10"
     >
-      <a href="/" class="text-sm font-bold tracking-wide whitespace-nowrap uppercase">Renata Mandelman</a>
+      <!-- data-home: además de ir a "/", borra la vista guardada para volver al inicio (ver script) -->
+      <a href="/" data-home class="text-sm font-bold tracking-wide whitespace-nowrap uppercase">Renata Mandelman</a>
       <nav aria-label="Principal">
         <ul class="flex gap-5 text-[0.6875rem] tracking-[0.14em] whitespace-nowrap uppercase md:gap-10 md:text-xs">
           {
@@ -57,70 +66,77 @@ const navLinks = [
           }
         </ul>
       </nav>
-      <!-- Hora de Buenos Aires en vivo (la actualiza el script de abajo) -->
-      <p class="hidden justify-self-end font-mono text-xs text-muted sm:block">
-        BA <time data-clock>--:--</time>
-      </p>
+   
     </div>
   </header>
 
-  <main id="main" class="mx-auto max-w-[1440px]">
-    <!-- .stage: referencia para centrar el nombre flotante sobre el split
-         (el panel Design queda afuera para que no corra el centro hacia abajo) -->
-    <div class="stage">
-      <!-- IDENTIDAD: nombre + toggle.
-           Desktop grande en vista dual → flota en el centro, encima del divisor.
-           Resto de los casos → display: contents (como si el div no existiera) y queda arriba. -->
-      <div class="identity">
-        <!-- HERO -->
-        <section class="hero px-5 pt-14 pb-8 text-center md:px-10 md:pt-20" aria-label="Presentación">
-          <slot name="hero" />
-        </section>
+  <!-- relative: referencia para ubicar el nombre flotante de la portada -->
+  <main id="main" class="relative mx-auto max-w-[1440px]">
+    <!-- IDENTIDAD: nombre + toggle.
+         Desktop en la portada → flota arriba al centro, encima de las columnas.
+         Resto de los casos → display: contents (como si el div no existiera) y queda arriba. -->
+    <div class="identity">
+      <!-- HERO -->
+      <section class="hero px-6 pt-10 pb-6 text-center md:px-10 md:pt-12" aria-label="Presentación">
+        <slot name="hero" />
+      </section>
 
-        <!-- Toggle: queda "pegado" arriba al scrollear para cambiar de vista en cualquier momento -->
-        <div class="toggle-dock">
-          <ViewToggle />
-        </div>
-      </div>
-
-      <!-- SPLIT -->
-      <div class="split">
-        <section
-          class="pane pane--content"
-          id="pane-content"
-          aria-labelledby="pane-content-title"
-        >
-          <button class="rail" type="button" data-rail="content" aria-label="Volver a la vista Design (dual)">
-            <span>Content</span>
-          </button>
-          <div class="pane-body">
-            <slot name="content" />
-          </div>
-        </section>
-
-        <div class="divider" aria-hidden="true"></div>
-
-        <section class="pane pane--code" id="pane-code" aria-labelledby="pane-code-title">
-          <button class="rail" type="button" data-rail="code" aria-label="Volver a la vista Design (dual)">
-            <span>Code</span>
-          </button>
-          <div class="pane-body">
-            <slot name="code" />
-          </div>
-        </section>
+      <!-- Toggle: queda "pegado" arriba al scrollear para cambiar de vista en cualquier momento -->
+      <div class="toggle-dock">
+        <ViewToggle />
       </div>
     </div>
 
-    <!-- DESIGN: debajo del split, centrado. Solo se ve con data-view="design" -->
-    <section class="pane--design" id="pane-design" aria-labelledby="pane-design-title">
-      <div class="pane-body">
-        <slot name="design" />
-      </div>
+    <!-- Pista para mobile: solo se ve en la vista inicial (la muestra el CSS según data-view) -->
+    <p class="view-hint px-6 text-center text-xs text-muted">Tocá Content, Design o Code para ver cada área</p>
+
+    <!-- SPLIT: tres paneles. Cada uno tiene un riel (se ve cuando el panel está colapsado)
+         y, al final, botones para ir a las otras vistas (solo mobile) -->
+    <div class="split">
+      {
+        views.map((view, i) => (
+          <>
+            {/* Divisor entre paneles (no antes del primero) */}
+            {i > 0 && <div class="divider" aria-hidden="true" />}
+            <section
+              class={`pane pane--${view.id}`}
+              id={`pane-${view.id}`}
+              aria-labelledby={`pane-${view.id}-title`}
+            >
+              <button class="rail" type="button" data-go={view.id} aria-label={`Ir a la vista ${view.label}`}>
+                <span>{view.label}</span>
+              </button>
+              <div class="pane-body">
+                {view.id === 'content' && <slot name="content" />}
+                {view.id === 'design' && <slot name="design" />}
+                {view.id === 'code' && <slot name="code" />}
+
+                {/* Mobile: al terminar el panel, botones para seguir con las otras vistas */}
+                <nav class="pane-next" aria-label="Otras vistas">
+                  {views
+                    .filter((other) => other.id !== view.id)
+                    .map((other) => (
+                      <button type="button" data-go={other.id} class="bento px-4 py-2 font-mono text-xs uppercase">
+                        Ver {other.label} →
+                      </button>
+                    ))}
+                </nav>
+              </div>
+            </section>
+          </>
+        ))
+      }
+    </div>
+
+    <!-- SOBRE MÍ: debajo de las columnas, en todas las vistas.
+         id="sobre-mi" es el destino del link "Sobre mí" del header -->
+    <section id="sobre-mi" class="border-t border-line px-6 py-12 md:px-10 md:py-16" aria-labelledby="sobre-mi-title">
+      <slot name="about" />
     </section>
   </main>
 
   <footer class="border-t border-line">
-    <div class="mx-auto max-w-[1440px] px-5 py-8 md:px-10">
+    <div class="mx-auto max-w-[1440px] px-6 py-8 md:px-10">
       <slot name="footer" />
     </div>
   </footer>
@@ -129,36 +145,9 @@ const navLinks = [
 <style>
   /* ---------- Identidad (nombre + toggle) ----------
      display: contents hace que el div "desaparezca" del layout: sus hijos
-     se comportan como hijos directos de .stage, así el toggle sticky sigue
-     funcionando a lo largo de los paneles. */
+     se comportan como hijos directos de <main>, así el toggle sticky
+     acompaña el scroll en las vistas de cada área. */
   .identity { display: contents; }
-
-  /* El nombre y el toggle se animan entre arriba y el centro al cambiar de vista */
-  .hero { view-transition-name: hero; }
-  .toggle-dock { view-transition-name: toggle; }
-
-  .stage { position: relative; }
-
-  /* Desktop grande + vista dual: el bloque flota en el centro, encima del divisor */
-  @media (min-width: 1200px) {
-    :global(html[data-view='design']) .identity {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      translate: -50% -50%;
-      z-index: 40;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: max-content;
-      pointer-events: none; /* deja pasar el mouse a las piezas de abajo (el toggle lo reactiva en .toggle-dock) */
-    }
-    :global(html[data-view='design']) .hero { padding: 0; }
-    :global(html[data-view='design']) .toggle-dock {
-      position: static;
-      padding: 1.5rem 0 0;
-    }
-  }
 
   /* ---------- Toggle fijo ---------- */
   .toggle-dock {
@@ -172,90 +161,135 @@ const navLinks = [
   }
   .toggle-dock > :global(*) { pointer-events: auto; } /* …pero el toggle sí */
 
-  /* ---------- Split: MOBILE FIRST (una columna) ---------- */
+  /* ---------- MOBILE FIRST: un panel a la vez ---------- */
   .split {
     display: grid;
     grid-template-columns: 1fr;
+    border-top: 1px solid var(--color-line);
   }
 
   .pane { min-width: 0; view-transition-name: var(--vt-name); }
   .pane--content { --vt-name: pane-content; }
+  .pane--design { --vt-name: pane-design; text-align: center; }
   .pane--code { --vt-name: pane-code; }
 
-  .pane-body { padding: 2rem 1.25rem 3rem; }
+  .pane-body { padding: 2rem 1.5rem 3rem; }
 
   .divider { height: 1px; background: var(--color-line); }
+
+  /* Todos los paneles ocultos… */
+  .pane,
+  .divider { display: none; }
+  /* …menos el que coincide con la vista elegida… */
+  :global(html[data-view='content']) .pane--content,
+  :global(html[data-view='design']) .pane--design,
+  :global(html[data-view='code']) .pane--code,
+  /* …o todos (apilados) en la vista inicial */
+  :global(html[data-view='all']) .pane,
+  :global(html[data-view='all']) .divider {
+    display: block;
+  }
+
+  /* Pista: solo en la vista inicial */
+  .view-hint { display: none; margin-top: -0.75rem; padding-bottom: 1.25rem; }
+  :global(html[data-view='all']) .view-hint { display: block; }
+
+  /* Botones "Ver …" al final de cada panel */
+  .pane-next {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 2.5rem;
+  }
+
+  /* En la vista inicial ya se ven todos los paneles: los botones "Ver …" sobran */
+  :global(html[data-view='all']) .pane-next { display: none; }
 
   /* El riel solo existe en desktop */
   .rail { display: none; }
 
-  /* ---------- Design: panel de abajo ----------
-     Oculto por defecto; en modo design aparece debajo del split, centrado
-     (Design es el botón del medio del toggle) */
-  .pane--design {
-    display: none;
-    border-top: 1px solid var(--color-line);
-    text-align: center;
-    view-transition-name: pane-design;
-  }
-  :global(html[data-view='design']) .pane--design { display: block; }
-
-  /* Mobile: en modo "content" o "code" se oculta el otro panel */
-  :global(html[data-view='content']) .pane--code,
-  :global(html[data-view='content']) .divider,
-  :global(html[data-view='code']) .pane--content,
-  :global(html[data-view='code']) .divider {
+  /* ---------- Proyectos de cada panel ----------
+     .more (lo ponen los slots de index.astro, por eso :global) se ve solo
+     cuando SU panel está elegido: en la portada cada columna muestra solo su imagen */
+  :global(html:not([data-view='content'])) .pane--content :global(.more),
+  :global(html:not([data-view='design'])) .pane--design :global(.more),
+  :global(html:not([data-view='code'])) .pane--code :global(.more) {
     display: none;
   }
 
-  /* ---------- Split: DESKTOP (lado a lado) ---------- */
-  @media (min-width: 900px) {
+  /* ---------- DESKTOP: tres columnas ---------- */
+  @media (min-width: 1100px) {
     .split {
-      --left: 1fr;
-      --right: 1fr;
-      grid-template-columns: var(--left) 1px var(--right);
+      --c1: 1fr;
+      --c2: 1fr;
+      --c3: 1fr;
+      grid-template-columns: var(--c1) 1px var(--c2) 1px var(--c3);
       min-height: 70dvh;
       /* Las columnas de grid se pueden animar en navegadores modernos */
       transition: grid-template-columns 0.5s var(--ease-out-soft);
     }
 
-    .divider { height: auto; width: 1px; }
-    .pane-body { padding: 2.5rem clamp(1.5rem, 4vw, 3.75rem) 2rem; }
+    /* En desktop se ven todos los paneles y divisores; la pista y los botones "Ver …" no hacen falta */
+    .pane,
+    .divider { display: block; }
+    .divider { height: auto; }
+    .view-hint,
+    :global(html[data-view='all']) .view-hint,
+    .pane-next { display: none; }
 
-    /* Vista dual: el split ocupa la pantalla (menos el header) y cada panel
-       reparte sus hijos: título arriba, piezas al medio, etiqueta abajo */
-    :global(html[data-view='design']) .split { min-height: calc(100dvh - 4rem); }
-    :global(html[data-view='design']) .pane { display: flex; flex-direction: column; }
-    :global(html[data-view='design']) .pane-body {
+    .pane-body { padding: 2.5rem clamp(1.25rem, 2.5vw, 2.5rem); }
+
+    /* --- Portada: una pantalla con el nombre flotando arriba al centro --- */
+    :global(html[data-view='all']) .identity {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      translate: -50% 0;
+      z-index: 40;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: max-content;
+    }
+    /* El toggle viaja con el nombre (no sticky) */
+    :global(html[data-view='all']) .toggle-dock { position: static; padding-bottom: 0; }
+
+    /* Las columnas ocupan la pantalla (menos el header) y las líneas suben detrás del nombre */
+    :global(html[data-view='all']) .split {
+      min-height: calc(100dvh - 3.5rem);
+      border-top: 0;
+    }
+    /* Cada columna: título arriba (debajo del nombre), imagen al medio, etiqueta abajo */
+    :global(html[data-view='all']) .pane { display: flex; flex-direction: column; }
+    :global(html[data-view='all']) .pane-body {
       flex: 1;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 2.5rem;
+      gap: 1.5rem;
+      padding-top: 15rem; /* lugar para el nombre + toggle que flotan arriba */
     }
 
-    /* En desktop ningún panel desaparece: el que pierde foco se vuelve un riel */
-    :global(html[data-view='content']) .pane--code,
-    :global(html[data-view='code']) .pane--content,
-    :global(html[data-view]) .divider {
-      display: block;
-    }
-
-    :global(html[data-view='content']) .split { --left: 1fr; --right: 4.5rem; }
-    :global(html[data-view='code']) .split { --left: 4.5rem; --right: 1fr; }
+    /* Vista inicial: las tres columnas iguales (los valores por defecto de arriba).
+       Content / Design / Code: ese panel grande y los otros como rieles */
+    :global(html[data-view='content']) .split { --c1: 1fr; --c2: 4.5rem; --c3: 4.5rem; }
+    :global(html[data-view='design']) .split { --c1: 4.5rem; --c2: 1fr; --c3: 4.5rem; }
+    :global(html[data-view='code']) .split { --c1: 4.5rem; --c2: 4.5rem; --c3: 1fr; }
 
     /* Panel colapsado: se oculta su contenido (visibility también lo saca
        del orden de tabulación y de los lectores de pantalla) y aparece el riel */
-    :global(html[data-view='content']) .pane--code .pane-body,
-    :global(html[data-view='code']) .pane--content .pane-body {
+    :global(html[data-view='content']) :is(.pane--design, .pane--code) .pane-body,
+    :global(html[data-view='design']) :is(.pane--content, .pane--code) .pane-body,
+    :global(html[data-view='code']) :is(.pane--content, .pane--design) .pane-body {
       visibility: hidden;
       height: 0;
       overflow: hidden;
       padding: 0;
     }
-
-    :global(html[data-view='content']) .pane--code .rail,
-    :global(html[data-view='code']) .pane--content .rail {
+    :global(html[data-view='content']) :is(.pane--design, .pane--code) .rail,
+    :global(html[data-view='design']) :is(.pane--content, .pane--code) .rail,
+    :global(html[data-view='code']) :is(.pane--content, .pane--design) .rail {
       display: flex;
     }
 
@@ -295,11 +329,22 @@ const navLinks = [
   tick();
   setInterval(tick, 30_000);
 
-  // Los rieles laterales vuelven a la vista Design (dual) "clickeando" el radio del toggle,
-  // así toda la lógica de estado sigue viviendo en un solo lugar (ViewToggle).
-  document.querySelectorAll<HTMLButtonElement>('[data-rail]').forEach((rail) => {
-    rail.addEventListener('click', () => {
-      document.querySelector<HTMLInputElement>('[data-view-toggle] input[value="design"]')?.click();
+  // Rieles y botones "Ver …": cada uno lleva a la vista de su data-go
+  // "clickeando" ese radio del toggle, así toda la lógica de estado sigue
+  // viviendo en un solo lugar (ViewToggle).
+  document.querySelectorAll<HTMLButtonElement>('[data-go]').forEach((button) => {
+    button.addEventListener('click', () => {
+      document.querySelector<HTMLInputElement>(`[data-view-toggle] input[value="${button.dataset.go}"]`)?.click();
+      // Los botones dentro de un panel (no los rieles) pueden estar abajo de todo:
+      // volvemos arriba para ver el panel nuevo desde el principio
+      if (button.closest('.pane-body')) document.getElementById('main')?.scrollIntoView();
     });
+  });
+
+  // Nombre del header: borra la vista guardada antes de navegar a "/",
+  // así la página vuelve a cargar en la vista inicial ("all").
+  // 'rm-view' es la misma clave que usan ViewToggle y BaseLayout.
+  document.querySelector('[data-home]')?.addEventListener('click', () => {
+    try { localStorage.removeItem('rm-view'); } catch (_) {}
   });
 </script>

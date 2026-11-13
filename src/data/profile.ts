@@ -36,8 +36,12 @@ export const profile = {
   location: 'CABA, Buenos Aires, Argentina',
   tagline: 'Diseñadora multimedial & desarrolladora web',
   github: 'renatamandelman', // lo usa también DynamicApiWidget para la API de GitHub
-  heroBadge: 'Estudio de producción', // pastilla arriba del nombre en el hero
   heroVideo: '7612772716013243656', // id del video del celular del hero (tiene que estar en algún videos[])
+  // Texto de la sección "Sobre mí" (tomado del CV). Cada string es un párrafo.
+  about: [
+    'Diseñadora multimedial con formación en tecnología, diseño visual y comunicación digital. Experiencia en creación de contenido para redes sociales, desarrollo web front-end y diseño gráfico para marcas.',
+    'Manejo avanzado de Adobe Creative Suite, Figma y herramientas de edición de video, así como conocimientos en HTML, CSS, JavaScript y Node.js. Me adapto rápido a entornos dinámicos, con capacidad para trabajar tanto en equipo como de forma autónoma, siempre buscando aportar soluciones creativas y funcionales.',
+  ],
 };
 
 /** Redes del footer: agregar o sacar una red es solo editar esta lista. */
@@ -63,29 +67,76 @@ export const projects: Project[] = [
 /**
  * Trabajos del modo Design. `category` agrupa las tarjetas en el panel;
  * una categoría sin trabajos no se muestra.
+ * `featured`: el trabajo que se muestra en la columna Design de la vista inicial
+ * (si hay más de uno marcado, se usa el primero).
  */
 export interface DesignWork extends Project {
-  category: 'Gráfico' | 'UX/UI';
+  category: 'Gráfico' | 'UX/UI' | 'Motion';
+  featured?: boolean;
 }
 
-export const designCategories: DesignWork['category'][] = ['Gráfico', 'UX/UI'];
+// El orden de esta lista es el orden de las secciones en el panel Design
+export const designCategories: DesignWork['category'][] = ['Gráfico', 'UX/UI', 'Motion'];
 
+// Trabajos de Behance (behance.net/renatamandelman)
 export const designWork: DesignWork[] = [
+  {
+    title: 'Loopies | Brand Identity',
+    type: 'Identidad de marca · Behance',
+    category: 'Gráfico',
+    url: 'https://www.behance.net/gallery/219041233/Loopies-Brand-Identity',
+    image: '/design/loopies-brand-identity.jpg',
+    featured: true,
+  },
+  {
+    title: 'Flyer Evento Artista',
+    type: 'Pieza gráfica · Behance',
+    category: 'Gráfico',
+    url: 'https://www.behance.net/gallery/200724391/Flyer-Evento-Artista',
+    image: '/design/flyer-evento-artista.jpg',
+  },
   {
     title: 'Loopies',
     type: 'Diseño web · Behance',
     category: 'UX/UI',
     url: 'https://www.behance.net/gallery/216006653/Loopies-Disfruta-el-viaje-saborea-el-loop',
   },
-  // ← agregar acá los trabajos de diseño gráfico con category: 'Gráfico'
+  {
+    title: 'Expo Desfiles',
+    type: 'Landing page · Behance',
+    category: 'UX/UI',
+    url: 'https://www.behance.net/gallery/195508341/EXPO-DESFILES-Landing',
+    image: '/design/expo-desfiles.jpg',
+  },
+  {
+    title: 'LockIt',
+    type: 'Prototipo mobile · Behance',
+    category: 'UX/UI',
+    url: 'https://www.behance.net/gallery/184633719/LockIt-Prototipo-Mobile',
+    image: '/design/lockit.jpg',
+  },
+  {
+    title: 'Discurso Falso',
+    type: 'Video · Behance',
+    category: 'Motion',
+    url: 'https://www.behance.net/gallery/224491013/Discurso-Falso',
+    image: '/design/discurso-falso.jpg',
+  },
+  {
+    title: 'Un día conmigo',
+    type: 'Vlog · Behance',
+    category: 'Motion',
+    url: 'https://www.behance.net/gallery/222505109/Un-dia-conmigo-Vlog',
+    image: '/design/un-dia-conmigo.jpg',
+  },
+  {
+    title: 'Animación Gimnasio',
+    type: 'Animación · After Effects',
+    category: 'Motion',
+    url: 'https://www.behance.net/gallery/225289859/Animacion-Gimnasio',
+    image: '/design/animacion-gimnasio.jpg',
+  },
 ];
-
-/** Animación destacada del lado content (la tarjeta horizontal del hero). */
-export const motionProject: Project = {
-  title: 'Animación Gimnasio',
-  type: 'Motion · After Effects',
-  url: 'https://www.behance.net/gallery/225289859/Animacion-Gimnasio',
-};
 
 export const experiences: Experience[] = [
   {
@@ -147,7 +198,7 @@ export const experiences: Experience[] = [
     videos: [
       { brand: 'La Roche-Posay', title: 'Anthelios DermoPediátrico SPF50+', platform: 'tiktok', src: '7627963069204843796' },
       { brand: 'Vichy', title: 'Liftactiv Collagen Specialist 16', platform: 'tiktok', src: '7614635631154613522' },
-      { brand: 'Vichy', title: 'Protector solar', platform: 'tiktok', src: '7612772716013243656' }, // ← video del hero (poster opcional: '/videos/vichy-protector-solar.jpg')
+      { brand: 'Vichy', title: 'Protector solar', platform: 'tiktok', src: '7612772716013243656', poster: '/videos/vichy-protector-solar.jpg' }, // ← video del hero (el poster es la portada del celular)
       { brand: 'CeraVe', title: 'Limpiador + Loción Humectante', platform: 'tiktok', src: '7611574593475693842' },
       { brand: 'Maybelline', title: 'Tattoo Liner 48H', platform: 'tiktok', src: '7530338466295516434' },
       { brand: 'Hogar & Deco', title: 'Antes y después con almohadones', platform: 'local', src: '/videos/hogar-antes-y-despues.mp4', poster: '/videos/hogar-antes-y-despues.jpg' },
