@@ -16,7 +16,7 @@ Entrega: 19/11/2026. Defensa individual con modificación de código en vivo: **
 - Explicar en español qué cambia y por qué antes de editar. Cambios chicos y revisables.
 - Comentarios del código en español, simples.
 - No agregar dependencias ni frameworks (React, etc.) sin preguntar.
-- Colores solo desde los tokens. `accent` (#E09F93) nunca para texto: usar `accent-ink`.
+- Colores solo desde los tokens. `accent` (#7FCFC3, verde agua) nunca para texto: usar `accent-ink`.
 - Accesibilidad: elementos nativos primero (button, dialog, radio), foco visible, alt en imágenes.
 - Probar a 390px y 1440px.
 - Al cerrar una tarea, sumar la entrada a la Bitácora del `README.md` (primera persona, como estudiante).

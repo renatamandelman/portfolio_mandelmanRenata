@@ -14,14 +14,15 @@
 
 @theme {
   /* --- Color --------------------------------------------------------------- */
-  --color-cream: #faf9f6;        /* fondo general */
+  --color-cream: #f6faf9;        /* fondo base, apenas verdoso */
   --color-surface: #ffffff;      /* tarjetas bento */
   --color-ink: #18181b;          /* texto principal (contraste 16.8:1 sobre cream) */
-  --color-muted: #71717a;        /* texto secundario (4.6:1 → pasa AA) */
+  --color-muted: #5b5b63;        /* texto secundario (5.3:1 aun en la parte más oscura del degradé → pasa AA) */
   --color-line: #e4e4e7;         /* bordes 1px */
-  --color-accent: #e09f93;       /* salmón: SOLO fondos, bordes, decoración (2.1:1, no apto texto) */
-  --color-accent-soft: #f6e3df;  /* fondo suave para badges / hover */
-  --color-accent-ink: #9a4e42;   /* salmón oscuro para texto/links (5.6:1 → pasa AA) */
+  --color-accent: #7fcfc3;       /* verde agua: SOLO fondos, bordes, decoración (1.7:1, no apto texto).
+                                    Texto ink encima: 9.8:1 */
+  --color-accent-soft: #dcf2ee;  /* verde agua suave para fondos / hover */
+  --color-accent-ink: #1b6b60;   /* verde petróleo para texto/links (6:1 sobre cream → pasa AA) */
   --color-dot-red: #ff5f57;      /* "semáforo" de la ventana del editor (decorativo) */
   --color-dot-yellow: #febc2e;
   --color-dot-green: #28c840;
@@ -50,6 +51,21 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     scroll-behavior: smooth;
+  }
+
+  /* Fondo de toda la página: el degradé tipo "estudio" del hero.
+     Va en una capa fija detrás de todo (z-index -1): así no se estira cuando la página es larga
+     y se ve igual al scrollear. position: fixed funciona bien también en celular. */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: radial-gradient(
+      120% 90% at 50% 20%,
+      color-mix(in srgb, var(--color-accent-soft) 50%, white),
+      color-mix(in srgb, var(--color-accent) 35%, var(--color-cream))
+    );
   }
 
   ::selection {

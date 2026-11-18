@@ -102,6 +102,7 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 - **Elementos nativos:** el toggle son radios, los modales son `<dialog>` y todo lo que se toca es un `<button>` o un link. Así funciona con teclado (Tab, flechas, Esc) sin programarlo aparte.
 - **Foco visible:** cuando navegás con teclado, todo lo que tiene foco muestra un borde oscuro.
 - **Link "Saltar al contenido":** es lo primero que aparece al tocar Tab y lleva directo al contenido principal.
+- **Contraste:** mi verde agua (`#7FCFC3`) es muy claro para usarlo como color de texto, así que lo uso solo de fondo, con texto oscuro encima (9,8:1). Para textos y links uso un verde petróleo (`#1B6B60`, 6:1). Como el fondo es un degradé, oscurecí el gris de los textos secundarios (`#5B5B63`) para que pase el mínimo (4,5:1) también en la parte más oscura.
 - **Imágenes:** las imágenes de los proyectos tienen `alt=""` a propósito, porque el link ya tiene el nombre del proyecto en texto y el lector lo diría dos veces. Los videos embebidos tienen un `title` con la marca y el nombre del video.
 
 ## Limitaciones y mejoras
@@ -277,6 +278,8 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - **Hero nuevo inspirado en una referencia** (`referencias/image.png`, un portfolio con estética de estudio fotográfico). Tomé la composición: la palabra "PORTFOLIO" gigante, el nombre fino con el año, tarjetas tipo vidrio a los costados y un dock de herramientas abajo. La adapté a mi portfolio: sin foto mía (en el centro va un abanico con tres trabajos reales), con mis colores y con las tres áreas como botones en la tarjeta de la derecha. Los íconos del dock son tiles con iniciales y mis colores, no los logos de las marcas.
 - Con el hero como sección propia arriba, saqué el CSS que hacía flotar el nombre encima de las columnas: `SplitLayout` quedó más simple.
 - La lista de áreas (id, texto y botón) pasó a `profile.ts` (`areas`), así el hero y `SplitLayout` usan la misma y no hay que cambiarla en dos lugares.
+- **Paleta verde agua.** Cambié el salmón por tonos verde agua. Como los colores son tokens en `global.css`, cambiar los valores de `accent`, `accent-soft` y `accent-ink` alcanzó para cambiar todo el sitio. Antes de elegirlos medí el contraste: el verde agua va solo de fondo y para texto uso un verde petróleo.
+- **El fondo del hero ahora está en toda la página.** Lo saqué del `Hero` y lo puse en `body::before`, una capa con `position: fixed` detrás de todo: no se estira cuando la página es larga y se ve igual al scrollear. Por eso oscurecí un poco el gris de los textos secundarios.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

@@ -95,7 +95,7 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
 </section>
 
 <style>
-  /* ---------- Fondo tipo "estudio": un degradé radial con mis salmones ---------- */
+  /* El fondo degradé ya no está acá: está en toda la página (body::before en global.css) */
   .hero {
     position: relative;
     overflow: hidden;
@@ -103,11 +103,6 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
     flex-direction: column;
     align-items: center;
     padding: 2.5rem 1.5rem 2rem;
-    background: radial-gradient(
-      120% 90% at 50% 30%,
-      color-mix(in srgb, var(--color-accent-soft) 60%, white),
-      color-mix(in srgb, var(--color-accent) 55%, var(--color-cream))
-    );
   }
 
   /* ---------- "PORTFOLIO" gigante ----------
@@ -119,7 +114,7 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
     letter-spacing: -0.03em;
     text-transform: uppercase;
     color: white;
-    text-shadow: 0 10px 40px rgb(154 78 66 / 0.15); /* sombra suave con accent-ink */
+    text-shadow: 0 10px 40px color-mix(in srgb, var(--color-accent-ink) 20%, transparent); /* sombra suave con accent-ink */
     user-select: none;
   }
 
