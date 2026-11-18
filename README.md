@@ -1,7 +1,7 @@
 # Renata Mandelman — Portfolio "Split View"
 
 Portfolio personal e interactivo para el Examen Final de **Programación Multimedial IV**.
-Hago videos para redes, diseño y páginas web. El sitio es una pantalla dividida en esas tres partes, y quien entra elige por dónde empezar con el toggle `[ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]`.
+Hago videos para redes, diseño y páginas web. El sitio es una pantalla dividida en esas tres partes, y quien entra elige por dónde empezar desde el hero ("¿Qué querés ver?"). Cada área le cambia a toda la página la forma de mirar: como un feed, como un archivo de Figma o como un plano técnico.
 
 **¿Para quién es?** 
 Para las personas que me pueden contratar o convocar: marcas y agencias que buscan creadoras UGC, estudios de diseño y equipos de desarrollo web. Cada una puede ir directo a su área sin pasar por las otras, y al mismo tiempo ver que las tres conviven en mi trabajo.
@@ -27,8 +27,8 @@ npm run preview    # sirve /dist localmente para probar el build
 ├── README.md               # Documentación + bitácora de proceso
 ├── public/                 # Archivos estáticos (favicon, imágenes, videos)
 └── src/
-    ├── components/         # Componentes propios (ViewToggle, ProjectCard, DynamicApiWidget)
-    ├── data/profile.ts     # Datos del CV (experiencias, stack)
+    ├── components/         # Componentes propios (Hero, ViewToggle, ProjectCard, BrowserCard, DynamicApiWidget, ProjectLink)
+    ├── data/profile.ts     # Todos los datos: textos, áreas, videos, diseños, proyectos, herramientas
     ├── layouts/            # BaseLayout (head/SEO) y SplitLayout (las tres columnas)
     ├── pages/index.astro   # Página principal
     └── styles/global.css   # Design tokens y estilos base
@@ -56,7 +56,7 @@ Además, los layouts tienen su propia lógica: `SplitLayout.astro` arma las tres
 
 **Tailwind CSS (v4)** lo usé porque ya lo conocía y me deja maquetar rápido. No tiene archivo de configuración: mis colores, tipografías y espacios están definidos como *tokens* en `src/styles/global.css`, así si quiero cambiar un color lo cambio en un solo lugar. Para las partes más complejas, como las columnas que cambian según la vista, escribí CSS común dentro de cada componente porque se entiende mejor.
 
-**Tipografías:** Bricolage Grotesque para mi nombre y los títulos, porque es amable y con personalidad; Inter para los textos y JetBrains Mono para el toggle y los detalles "de código", que remiten a la parte de programación. Las instalé con Fontsource para que se sirvan desde mi sitio y no dependan de Google Fonts.
+**Tipografías:** Bricolage Grotesque para mi nombre y los títulos, porque es amable y con personalidad; Inter para los textos y JetBrains Mono para los detalles "de código" (las direcciones de los sitios, las etiquetas y los títulos de la lente de Programación). Las instalé con Fontsource para que se sirvan desde mi sitio y no dependan de Google Fonts.
 
 **No usé React ni otro framework.** Las interacciones son simples y con TypeScript dentro de los `<script>` de Astro alcanzaba. Sumar un framework hubiera sido más código para explicar sin que la experiencia mejore.
 
@@ -82,7 +82,7 @@ GET https://api.github.com/users/renatamandelman/repos?per_page=100&sort=updated
 - **Cargando:** mientras espera la respuesta, debajo de la lista aparece "Cargando más proyectos…".
 - **Con datos:** se agregan los proyectos y el aviso desaparece.
 - **Vacío:** si GitHub responde pero no queda ningún repo para mostrar, aparece "Por ahora no hay más proyectos para mostrar" en vez de un hueco.
-- **Error:** distingo tres casos con mensajes distintos: sin conexión, límite de pedidos (GitHub responde 403) y cualquier otro error de GitHub. En los tres casos los proyectos fijos se siguen viendo y aparece un botón **"Reintentar"**.
+- **Error:** distingo tres casos con mensajes distintos: sin conexión, límite de pedidos (GitHub responde 403) y cualquier otro error de GitHub. En los tres casos los tres sitios de arriba se siguen viendo (no dependen de la API) y aparece un botón **"Reintentar"**.
 
 **Límites:** sin token, GitHub permite **60 pedidos por hora por IP**. Para un portfolio alcanza, porque cada visita hace un solo pedido. Si se pasa, aviso que hay que probar en un rato. No usé token porque en un sitio estático quedaría visible en el código del navegador.
 
@@ -98,14 +98,16 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 - **Desktop (desde 1024px, una notebook chica):** el hero muestra las tarjetas a los costados del abanico, que se achican con `clamp()` para no pisarse en pantallas chicas. Las tres columnas se ven una al lado de la otra y cada una se alinea según su lugar (izquierda, centro, derecha). Al elegir un área, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
 - **Tablet (640 a 1023px):** en el hero el abanico va primero y las dos tarjetas quedan lado a lado debajo. Las columnas se apilan, todas alineadas a la izquierda, que se lee mejor.
 - **Mobile:** en el hero, primero el abanico (lo visual) y después las tarjetas, una debajo de la otra; el dock se scrollea de costado. Al elegir un área se ve solo ese panel, con "← Ver las tres áreas" arriba y, al final, botones para ir a las otras áreas sin volver arriba.
-- Para que la imagen y los proyectos se acomoden lado a lado usé **container queries** (`@container`): dependen del ancho del panel, que cambia con el toggle, y no del ancho de la pantalla.
-- Probé a 390px (celular): portada y las tres vistas.
+- Para las grillas de trabajos usé **container queries** (`@container`): la cantidad de columnas depende del ancho del panel, que cambia según el área elegida, y no del ancho de la pantalla.
+- Revisé la portada y las tres áreas a 390, 768, 1024 y 1440 px.
 
 **Accesibilidad.**
 - **Elementos nativos:** el toggle son radios, los modales son `<dialog>` y todo lo que se toca es un `<button>` o un link. Así funciona con teclado (Tab, flechas, Esc) sin programarlo aparte.
 - **Foco visible:** cuando navegás con teclado, todo lo que tiene foco muestra un borde oscuro.
 - **Link "Saltar al contenido":** es lo primero que aparece al tocar Tab y lleva directo al contenido principal.
 - **Contraste:** mi verde agua (`#7FCFC3`) es muy claro para usarlo como color de texto, así que lo uso solo de fondo, con texto oscuro encima (9,8:1). Para textos y links uso un verde petróleo (`#1B6B60`, 6:1). Como el fondo es un degradé, oscurecí el gris de los textos secundarios (`#5B5B63`) para que pase el mínimo (4,5:1) también en la parte más oscura.
+- **Movimiento reducido:** si la persona tiene activado "reducir movimiento" en su sistema, se cortan las animaciones: el fundido entre áreas, la animación del hero al scrollear y los efectos al pasar el mouse.
+- **Toggle escondido pero accesible:** la barra no se ve, pero sus radios siguen en la página. Si alguien navega con Tab, la barra aparece, así nunca hay un foco invisible. Los cambios de área se anuncian a lectores de pantalla.
 - **Imágenes:** las imágenes de los proyectos tienen `alt=""` a propósito, porque el link ya tiene el nombre del proyecto en texto y el lector lo diría dos veces. Los videos embebidos tienen un `title` con la marca y el nombre del video.
 
 ## Limitaciones y mejoras
@@ -113,13 +115,15 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 Cosas que sé que todavía se pueden mejorar:
 - **Los proyectos de diseño se cargan a mano.** Como la API de Behance está cerrada, cada proyecto nuevo lo tengo que sumar en `profile.ts`.
 - **Límite de GitHub.** Sin token son 60 pedidos por hora por IP. Si alguna vez no alcanza, la mejora sería traer los repos en el momento del build en vez de en el navegador.
+- **La animación del hero al scrollear no anda en Firefox**, que todavía no soporta las scroll-driven animations. Ahí el hero se ve quieto, sin romperse.
+- **Las portadas de los videos son capturas fijas** del primer cuadro. Si cambio un video, tengo que volver a sacar su portada.
 
 
 ## Créditos y uso de IA
 
 - **Tipografías:** Bricolage Grotesque, Inter y JetBrains Mono (SIL Open Font License), instaladas con Fontsource.
 - **Videos UGC y de redes:** son trabajos míos para cada marca. Los nombres y productos (La Roche-Posay, Vichy, CeraVe, Maybelline, Cocinarg, entre otras) pertenecen a sus marcas y aparecen solo para mostrar mi trabajo.
-- **Videos de TikTok e Instagram:** se muestran con los reproductores oficiales de cada plataforma (embeds).
+- **Videos de TikTok e Instagram:** se muestran con los reproductores oficiales de cada plataforma (embeds). Las portadas son capturas del primer cuadro de esos mismos videos.
 - **Proyectos de diseño:** son míos; las versiones completas están en mi Behance.
 - **Datos de proyectos web:** API pública de GitHub.
 - **Maqueta de referencia de la portada:** hecha con Google Stitch (no usé su código).
@@ -132,6 +136,7 @@ Cosas que sé que todavía se pueden mejorar:
 
 > Mi registro de cómo fui armando el portfolio: qué hice, por qué, qué probé y descarté, y qué me quedó pendiente.
 > Lo voy escribiendo al terminar cada jornada.
+> Cada día cuenta cómo era el sitio en ese momento, así se ve cómo fue cambiando (por ejemplo, el toggle `[ CONTENT ⇄ CODE ]` del principio). Cómo es el sitio hoy está en las secciones de arriba.
 
 ### El problema que quiero resolver
 
