@@ -17,6 +17,7 @@
  *      El CSS de SplitLayout reacciona a ese atributo (una sola fuente de verdad).
  *   3. Se guarda en localStorage para recordar la preferencia.
  *   4. Se emite el evento "viewchange" para que otros componentes puedan escuchar.
+ *   5. Los botones [data-show-all] vuelven a la portada: desmarca los radios y escribe "all".
  */
 
 type View = 'content' | 'design' | 'code';
@@ -186,7 +187,8 @@ const options: { value: View; label: string; srLabel: string }[] = [
     code: 'Vista: programación',
   };
 
-  function setView(view: View) {
+  // 'all' = la portada con las tres áreas (ningún radio marcado)
+  function setView(view: View | 'all') {
     const root = document.documentElement;
     if (root.dataset.view === view) return;
 
@@ -203,7 +205,11 @@ const options: { value: View; label: string; srLabel: string }[] = [
       apply();
     }
 
-    try { localStorage.setItem(STORAGE_KEY, view); } catch (_) {}
+    // En la portada no guardamos nada: así al recargar también se ve la portada
+    try {
+      if (view === 'all') localStorage.removeItem(STORAGE_KEY);
+      else localStorage.setItem(STORAGE_KEY, view);
+    } catch (_) {}
     document.dispatchEvent(new CustomEvent('viewchange', { detail: { view } }));
   }
 
@@ -216,7 +222,11 @@ const options: { value: View; label: string; srLabel: string }[] = [
     const moveThumb = () => {
       const checked = toggle.querySelector<HTMLInputElement>('input:checked');
       const label = checked?.closest<HTMLElement>('.option');
-      if (!label) return;
+      // Ninguno marcado (portada): la pastilla se achica a 0 y no se ve
+      if (!label) {
+        thumb.style.setProperty('--thumb-w', '0px');
+        return;
+      }
       thumb.style.setProperty('--thumb-x', `${label.offsetLeft}px`);
       thumb.style.setProperty('--thumb-w', `${label.offsetWidth}px`);
     };
@@ -233,6 +243,17 @@ const options: { value: View; label: string; srLabel: string }[] = [
         setView(view);
         moveThumb();
         status.textContent = MESSAGES[view];
+      });
+    });
+
+    // Botones "Ver las tres áreas" (data-show-all): vuelven a la portada.
+    // Viven en SplitLayout, pero el que cambia el estado es este componente (única fuente de verdad)
+    document.querySelectorAll<HTMLButtonElement>('[data-show-all]').forEach((button) => {
+      button.addEventListener('click', () => {
+        inputs.forEach((input) => { input.checked = false; });
+        setView('all');
+        moveThumb();
+        status.textContent = 'Vista: las tres áreas';
       });
     });
 

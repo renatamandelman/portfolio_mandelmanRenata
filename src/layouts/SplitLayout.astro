@@ -71,6 +71,11 @@ const views = areas;
                 <span>{view.label}</span>
               </button>
               <div class="pane-body">
+                {/* Dentro de un área: volver a la portada con las tres. Lo atiende ViewToggle (data-show-all) */}
+                <button type="button" data-show-all class="pane-back">
+                  <span aria-hidden="true">←</span> Ver las tres áreas
+                </button>
+
                 {view.id === 'content' && <slot name="content" />}
                 {view.id === 'design' && <slot name="design" />}
                 {view.id === 'code' && <slot name="code" />}
@@ -206,6 +211,26 @@ const views = areas;
   .pane-cta:hover { background: var(--color-ink); color: var(--color-cream); }
   :global(html[data-view='all']) .pane-cta { display: block; }
 
+  /* Botón "Ver las tres áreas": solo dentro de un área (no en la portada) */
+  .pane-back {
+    display: none;
+    margin-bottom: 1.5rem;
+    padding: 0.4rem 0.9rem;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-pill);
+    background: var(--color-surface);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .pane-back:hover { border-color: var(--color-ink); }
+  :global(html:not([data-view='all'])) .pane-back { display: inline-flex; gap: 0.4rem; }
+
+  /* La imagen de portada de cada área (.pane-cover, la ponen los slots de index.astro)
+     solo se ve en la portada: adentro de un área quedan solo los trabajos que elegí */
+  :global(html:not([data-view='all'])) :global(.pane-cover) { display: none; }
+
   /* El riel solo existe en desktop */
   .rail { display: none; }
 
@@ -302,6 +327,11 @@ const views = areas;
       // llevamos la pantalla al principio de las columnas para ver el área elegida
       if (button.closest('.pane-body, [data-hero]')) document.getElementById('trabajos')?.scrollIntoView();
     });
+  });
+
+  // "Ver las tres áreas": el estado lo cambia ViewToggle; acá solo llevamos la pantalla a las columnas
+  document.querySelectorAll<HTMLButtonElement>('[data-show-all]').forEach((button) => {
+    button.addEventListener('click', () => document.getElementById('trabajos')?.scrollIntoView());
   });
 
   // Nombre (link al inicio): borra la vista guardada antes de navegar a "/",

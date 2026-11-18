@@ -79,13 +79,12 @@ const heroPreviews = [
       <p class="mt-2 text-sm text-muted md:text-base">Videos para que más gente conozca tu marca</p>
     </header>
 
-    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
-         Panel angosto (inicio, mobile) → uno debajo del otro.
-         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <!-- Portada (imagen, solo en la vista inicial) + proyectos (solo dentro del área).
+         @container: la grilla de proyectos se acomoda al ancho del PANEL, no al de la pantalla -->
     <div class="@container">
-      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
-        <!-- IMAGEN: el celular con un reel mío, centrado -->
-        <div class="mx-auto my-5 w-full max-w-md">
+      <div>
+        <!-- IMAGEN de la portada: el celular con un reel mío (.pane-cover: se esconde dentro del área) -->
+        <div class="pane-cover mx-auto my-5 w-full max-w-md">
           <!-- Celular con Reels: muestra heroVideo. El reproductor de TikTok se carga
                recién al tocar play (lo agrega el script de abajo). -->
           <div
@@ -154,14 +153,13 @@ const heroPreviews = [
       <p class="mt-2 text-sm text-muted md:text-base">Logos, piezas gráficas, apps y animación</p>
     </header>
 
-    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
-         Panel angosto (inicio, mobile) → uno debajo del otro.
-         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <!-- Portada (imagen, solo en la vista inicial) + proyectos (solo dentro del área).
+         @container: la grilla de proyectos se acomoda al ancho del PANEL, no al de la pantalla -->
     <div class="@container">
-      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
+      <div>
         <!-- IMAGEN: collage con 3 trabajos reales. El primero (destacado) ocupa las dos filas de la izquierda.
              Cada uno lleva a su proyecto en Behance -->
-        <ul class="mx-auto my-5 grid w-full max-w-md grid-cols-2 grid-rows-2 gap-2.5">
+        <ul class="pane-cover mx-auto my-5 grid w-full max-w-md grid-cols-2 grid-rows-2 gap-2.5">
           {
             designPreview.map((work, i) => (
               <li class={i === 0 ? 'row-span-2' : ''}>
@@ -265,8 +263,8 @@ const heroPreviews = [
     <div class="@container">
       <div>
         <!-- IMAGEN de la portada: un sitio mío (featured en profile.ts), inclinado en 3D en desktop (ver .tilt abajo).
-             En la vista Programación se esconde (.code-cover): los cuadrados de abajo ya lo muestran -->
-        {featuredSite && <BrowserCard project={featuredSite} class="tilt code-cover mx-auto my-5 w-full max-w-md" />}
+             .pane-cover: se esconde dentro del área (abajo ya están los cuadrados) -->
+        {featuredSite && <BrowserCard project={featuredSite} class="tilt pane-cover mx-auto my-5 w-full max-w-md" />}
 
         <!-- PROYECTOS (vista Programación) -->
         <div class="more my-8">
@@ -402,9 +400,6 @@ const heroPreviews = [
 </script>
 
 <style>
-  /* En la vista Programación la captura grande sobra: abajo están los cuadrados */
-  :global(html[data-view='code']) :global(.code-cover) { display: none; }
-
   /* ---------- Ventana del navegador inclinada (solo desktop y si no se pidió menos movimiento) ---------- */
   @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
     /* :global porque .tilt se aplica a BrowserCard (otro componente): el CSS con scope no le llegaría */
