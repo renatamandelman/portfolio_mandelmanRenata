@@ -43,10 +43,11 @@ export const profile = {
     src: '/videos/sobreMi.jpeg',
     alt: 'Retrato de Renata Mandelman frente a una pared de plantas',
   },
-  // Texto de la sección "Sobre mí" (tomado del CV). Cada string es un párrafo.
+  // Texto de la sección "Sobre mí", en primera persona y sin jerga. Cada string es un párrafo.
   about: [
-    'Diseñadora multimedial con formación en tecnología, diseño visual y comunicación digital. Experiencia en creación de contenido para redes sociales, desarrollo web front-end y diseño gráfico para marcas.',
-    'Manejo avanzado de Adobe Creative Suite, Figma y herramientas de edición de video, así como conocimientos en HTML, CSS, JavaScript y Node.js. Me adapto rápido a entornos dinámicos, con capacidad para trabajar tanto en equipo como de forma autónoma, siempre buscando aportar soluciones creativas y funcionales.',
+    'Soy Renata, diseñadora multimedial de Buenos Aires. Ayudo a marcas y emprendimientos a mostrarse bien en todos lados: en un video de redes, en su logo y en su página web.',
+    'Desde 2023 me ocupo de las redes de marcas como Cocinarg y Mentes Brillantes: pienso qué publicar, grabo, edito y diseño las piezas. También hago videos para marcas como Vichy, CeraVe y Maybelline.',
+    'Como además programo, puedo armar la página web de una marca de principio a fin. Hacer las tres cosas me deja ver el proyecto completo, y que el video, el diseño y la web cuenten lo mismo.',
   ],
 };
 

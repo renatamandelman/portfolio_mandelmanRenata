@@ -27,16 +27,8 @@ import {
   designWork,
   designCategories,
 } from '../data/profile';
-import type { Experience } from '../data/profile';
 
 const contentWork = experiences.filter((e) => e.side === 'content');
-
-// Experiencia en dos columnas: si el período dice "Presente" es un trabajo actual
-const isCurrent = (job: Experience) => job.period.includes('Presente');
-const experienceGroups = [
-  { title: 'Actual', jobs: experiences.filter(isCurrent) },
-  { title: 'Terminado', jobs: experiences.filter((job) => !isCurrent(job)) },
-];
 
 // Portada de Diseño: 3 trabajos con imagen, el destacado (featured) primero
 const designPreview = [...designWork.filter((work) => work.featured), ...designWork.filter((work) => !work.featured)]
@@ -350,37 +342,6 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
         <div class="mt-4 max-w-prose space-y-4 leading-relaxed">
           {profile.about.map((paragraph) => <p>{paragraph}</p>)}
         </div>
-      </div>
-    </div>
-  </Fragment>
-
-  <!-- ============ EXPERIENCIA ============ -->
-  <!-- Mi CV: sale de experiences (profile.ts), separado en dos columnas: Actual y Terminado.
-       Desktop: las dos columnas lado a lado. Mobile: una debajo de la otra -->
-  <Fragment slot="experience">
-    <div class="mx-auto max-w-5xl">
-      <h2 id="experiencia-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">Experiencia</h2>
-      <div class="mt-8 grid gap-10 md:grid-cols-2 md:gap-12">
-        {
-          experienceGroups.map((group) => (
-            <div>
-              <h3 class="eyebrow border-b border-line pb-2">{group.title}</h3>
-              <ol class="mt-6 space-y-8">
-                {group.jobs.map((job) => (
-                  <li>
-                    <p class="eyebrow">{job.period}</p>
-                    <h4 class="mt-1 font-bold">
-                      {job.role} · <span class="text-accent-ink">{job.company}</span>
-                    </h4>
-                    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-muted">
-                      {job.tasks.map((task) => <li>{task}</li>)}
-                    </ul>
-                  </li>
-                ))}
-              </ol>
-            </div>
-          ))
-        }
       </div>
     </div>
   </Fragment>
