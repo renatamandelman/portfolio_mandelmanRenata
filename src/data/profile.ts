@@ -37,6 +37,11 @@ export const profile = {
   tagline: 'Diseñadora multimedial & desarrolladora web',
   github: 'renatamandelman', // lo usa también DynamicApiWidget para la API de GitHub
   heroVideo: '7612772716013243656', // id del video del celular del hero (tiene que estar en algún videos[])
+  // Foto de la sección "Sobre mí"
+  photo: {
+    src: '/videos/sobreMi.jpeg',
+    alt: 'Retrato de Renata Mandelman frente a una pared de plantas',
+  },
   // Texto de la sección "Sobre mí" (tomado del CV). Cada string es un párrafo.
   about: [
     'Diseñadora multimedial con formación en tecnología, diseño visual y comunicación digital. Experiencia en creación de contenido para redes sociales, desarrollo web front-end y diseño gráfico para marcas.',

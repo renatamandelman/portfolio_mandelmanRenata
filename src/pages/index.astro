@@ -26,8 +26,16 @@ import {
   designWork,
   designCategories,
 } from '../data/profile';
+import type { Experience } from '../data/profile';
 
 const contentWork = experiences.filter((e) => e.side === 'content');
+
+// Experiencia en dos columnas: si el período dice "Presente" es un trabajo actual
+const isCurrent = (job: Experience) => job.period.includes('Presente');
+const experienceGroups = [
+  { title: 'Actual', jobs: experiences.filter(isCurrent) },
+  { title: 'Terminado', jobs: experiences.filter((job) => !isCurrent(job)) },
+];
 
 // Proyecto de diseño destacado para la portada (el primero con featured: true)
 const featuredWork = designWork.find((work) => work.featured);
@@ -152,18 +160,13 @@ const palette = [
         <!-- PROYECTOS (vista Content): marcas con las que trabajé, cada una abre su modal con tareas y videos.
              @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla -->
         <div class="more @container my-8">
-          <ul class="grid grid-cols-2 gap-3 @2xl:grid-cols-4" id="experiencia">
+          <ul class="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
             {contentWork.map((job) => <ProjectCard job={job} />)}
           </ul>
         </div>
       </div>
     </div>
 
-    <!-- Etiqueta de cierre del panel -->
-    <p class="flex flex-wrap items-center gap-2 border-t border-line pt-3">
-      <span class="text-base font-black tracking-tight uppercase">Creative Lab</span>
-      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">/ Social media</span>
-    </p>
   </Fragment>
 
   <!-- ============ PANEL DESIGN ============ -->
@@ -321,11 +324,6 @@ const palette = [
       </div>
     </div>
 
-    <!-- Etiqueta de cierre del panel -->
-    <p class="flex flex-wrap items-center justify-center gap-2 border-t border-line pt-3">
-      <span class="text-base font-black tracking-tight uppercase">Diseño UI/UX</span>
-      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">/ Brand identity</span>
-    </p>
   </Fragment>
 
   <!-- ============ PANEL CODE ============ -->
@@ -396,23 +394,62 @@ const palette = [
       </div>
     </div>
 
-    <!-- Etiqueta de cierre del panel -->
-    <p class="flex flex-wrap items-center gap-2 border-t border-line pt-3 md:justify-end">
-      <span class="text-base font-black tracking-tight uppercase">Desarrollo</span>
-      <span class="rounded-md bg-ink px-2 py-0.5 text-[9px] font-bold text-cream uppercase">Web development</span>
-    </p>
   </Fragment>
 
   <!-- ============ SOBRE MÍ ============ -->
-  <!-- Desktop: título a la izquierda y texto a la derecha. Mobile: uno debajo del otro -->
+  <!-- Desktop: foto redonda a la izquierda y texto a la derecha, centrado en alto con la foto (items-center).
+       Mobile: la foto arriba, centrada, y el texto debajo -->
   <Fragment slot="about">
-    <div class="mx-auto grid max-w-5xl gap-6 md:grid-cols-[1fr_2fr] md:gap-12">
+    <div class="mx-auto grid max-w-5xl items-center gap-8 md:grid-cols-[auto_1fr] md:gap-12">
+      <!-- Recorte redondo: aspect-square + rounded-full la vuelven un círculo,
+           object-cover recorta lo que sobra y object-[50%_25%] sube el encuadre a la cara.
+           width/height: el navegador reserva el lugar antes de que cargue (no "salta" el texto).
+           lazy: está abajo de todo, se descarga recién cuando te acercás scrolleando -->
+      <img
+        src={profile.photo.src}
+        alt={profile.photo.alt}
+        width="1200"
+        height="1600"
+        loading="lazy"
+        class="mx-auto aspect-square w-48 rounded-full border border-line object-cover object-[50%_25%] md:w-64"
+      />
       <div>
         <h2 id="sobre-mi-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">Sobre mí</h2>
         <p class="eyebrow mt-1">{profile.location}</p>
+        <div class="mt-4 max-w-prose space-y-4 leading-relaxed">
+          {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+        </div>
       </div>
-      <div class="max-w-prose space-y-4 leading-relaxed">
-        {profile.about.map((paragraph) => <p>{paragraph}</p>)}
+    </div>
+  </Fragment>
+
+  <!-- ============ EXPERIENCIA ============ -->
+  <!-- Mi CV: sale de experiences (profile.ts), separado en dos columnas: Actual y Terminado.
+       Desktop: las dos columnas lado a lado. Mobile: una debajo de la otra -->
+  <Fragment slot="experience">
+    <div class="mx-auto max-w-5xl">
+      <h2 id="experiencia-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">Experiencia</h2>
+      <div class="mt-8 grid gap-10 md:grid-cols-2 md:gap-12">
+        {
+          experienceGroups.map((group) => (
+            <div>
+              <h3 class="eyebrow border-b border-line pb-2">{group.title}</h3>
+              <ol class="mt-6 space-y-8">
+                {group.jobs.map((job) => (
+                  <li>
+                    <p class="eyebrow">{job.period}</p>
+                    <h4 class="mt-1 font-bold">
+                      {job.role} · <span class="text-accent-ink">{job.company}</span>
+                    </h4>
+                    <ul class="mt-2 list-disc space-y-1 pl-5 text-sm leading-relaxed text-muted">
+                      {job.tasks.map((task) => <li>{task}</li>)}
+                    </ul>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))
+        }
       </div>
     </div>
   </Fragment>

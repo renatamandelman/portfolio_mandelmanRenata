@@ -11,6 +11,7 @@
  *   - "design"  → columna del medio: Diseño gráfico / UX-UI
  *   - "code"    → columna derecha: Desarrollo Web
  *   - "about"   → "Sobre mí", debajo de las columnas (en todas las vistas)
+ *   - "experience" → mi CV, debajo de "Sobre mí" (en todas las vistas)
  *   - "footer"  → copyright y redes
  *
  * Vistas (en <html data-view>):
@@ -132,6 +133,12 @@ const views = [
          id="sobre-mi" es el destino del link "Sobre mí" del header -->
     <section id="sobre-mi" class="border-t border-line px-6 py-12 md:px-10 md:py-16" aria-labelledby="sobre-mi-title">
       <slot name="about" />
+    </section>
+
+    <!-- EXPERIENCIA: debajo de "Sobre mí", también en todas las vistas.
+         id="experiencia" es el destino del link "Experiencia" del header -->
+    <section id="experiencia" class="border-t border-line px-6 py-12 md:px-10 md:py-16" aria-labelledby="experiencia-title">
+      <slot name="experience" />
     </section>
   </main>
 
@@ -260,13 +267,12 @@ const views = [
       min-height: calc(100dvh - 3.5rem);
       border-top: 0;
     }
-    /* Cada columna: título arriba (debajo del nombre), imagen al medio, etiqueta abajo */
+    /* Cada columna: título arriba (debajo del nombre) y la imagen debajo */
     :global(html[data-view='all']) .pane { display: flex; flex-direction: column; }
     :global(html[data-view='all']) .pane-body {
       flex: 1;
       display: flex;
       flex-direction: column;
-      justify-content: space-between;
       gap: 1.5rem;
       padding-top: 15rem; /* lugar para el nombre + toggle que flotan arriba */
     }

@@ -226,9 +226,18 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 **Qué hice**
 - Completé partes del README: a quién está dirigido el portfolio, los componentes propios y las tecnologías y decisiones.
 - Ordené la bitácora: sumé la captura de mi primer diseño (dos columnas) en el Día 1 para que se vea de dónde arranqué.
+- Agregué la sección **Experiencia** debajo de "Sobre mí", con mi CV separado en dos columnas: **Actual** y **Terminado**. Sale de `experiences` en `profile.ts`: si el período dice "Presente", va en Actual.
+- Sumé mi **foto en "Sobre mí"**, recortada en círculo y con el texto centrado al lado.
+- Saqué las etiquetas del final de cada columna ("Creative Lab", "Diseño UI/UX", "Desarrollo"): repetían lo que ya dice el título de arriba.
+- Cambié el título de la pestaña a "Renata Mandelman - Portfolio".
 
 **Decisiones**
+- **El link "Experiencia" del header ahora lleva a algo.** Antes apuntaba a la lista de marcas del panel Content, que en la portada está oculta. La sección nueva está fuera de las columnas, así que se ve en todas las vistas.
 - **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
+
+**Problemas**
+- Reemplacé la portada del video de Vichy y borré el archivo viejo, pero `profile.ts` seguía apuntando a él y el celular de la portada se quedaba sin imagen. Aprendí que cuando cambio un archivo de `public/` tengo que revisar dónde se usa su ruta.
+- La primera versión nueva era un PNG de 2,8 MB, mucho más pesado que la anterior. La volví a exportar en JPG y quedó en 216 KB.
 
 ---
 
