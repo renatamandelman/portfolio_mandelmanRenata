@@ -4,7 +4,7 @@
  * Arma la experiencia: llena los slots de SplitLayout con los datos de profile.ts.
  *
  * Cada panel tiene dos partes:
- *   imagen → siempre visible (celular, frame de diseño, editor)
+ *   imagen → siempre visible: trabajo real (celular con un reel, collage de diseños, captura de un sitio)
  *   .more  → los proyectos de esa área: solo al tocar Content, Design o Code
  *            (lo decide el CSS de SplitLayout según <html data-view>)
  *
@@ -38,20 +38,16 @@ const experienceGroups = [
   { title: 'Terminado', jobs: experiences.filter((job) => !isCurrent(job)) },
 ];
 
-// Proyecto de diseño destacado para la portada (el primero con featured: true)
-const featuredWork = designWork.find((work) => work.featured);
+// Portada de Diseño: 3 trabajos con imagen, el destacado (featured) primero
+const designPreview = [...designWork.filter((work) => work.featured), ...designWork.filter((work) => !work.featured)]
+  .filter((work) => work.image)
+  .slice(0, 3);
+
+// Portada de Programación: el sitio marcado como featured en profile.ts
+const featuredSite = projects.find((project) => project.featured);
 
 // Video del celular: se busca por id entre los videos de todas las experiencias
 const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src === profile.heroVideo);
-
-// Paleta de la portada de Design: son los tokens reales del sitio (global.css)
-const palette = [
-  { name: 'Ink', className: 'bg-ink' },
-  { name: 'Accent', className: 'bg-accent' },
-  { name: 'Soft', className: 'bg-accent-soft' },
-  { name: 'Deep', className: 'bg-accent-ink' },
-  { name: 'Cream', className: 'bg-cream' },
-];
 ---
 
 <SplitLayout>
@@ -142,20 +138,10 @@ const palette = [
             }
           </ul>
 
-          <!-- Engagement con mini gráfico de barras -->
-          <div class="bento col-span-5 p-2.5">
-            <div class="flex items-center justify-between">
-              <div>
-                <span class="block text-[8px] font-bold text-muted uppercase">Engagement</span>
-                <span class="text-xs font-extrabold">{engagement.value}</span>
-              </div>
-              <span class="rounded-full bg-accent-soft px-1.5 py-0.5 text-[9px] font-bold text-accent-ink">
-                {engagement.delta}
-              </span>
-            </div>
-            <div class="mt-1.5 flex h-6 items-end gap-1 border-t border-line pt-1" aria-hidden="true">
-              {engagement.bars.map((h) => <span class="w-full rounded-t-sm bg-accent" style={`height:${h}%`} />)}
-            </div>
+          <!-- Interacción promedio (engagement) -->
+          <div class="col-span-5 rounded-[var(--radius-bento)] bg-accent-soft p-2.5">
+            <span class="block text-base font-extrabold tracking-tight">{engagement.value}</span>
+            <span class="text-[9px] font-semibold text-accent-ink uppercase">{engagement.label}</span>
           </div>
         </div>
 
@@ -189,79 +175,29 @@ const palette = [
          Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
     <div class="@container">
       <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
-        <!-- IMAGEN: un "frame" tipo Figma con el proyecto destacado, la tipografía y la paleta del sitio -->
-        <div class="mx-auto my-6 flex w-full max-w-md flex-col gap-2.5 text-left">
-          <figure class="bento p-3 shadow-md">
-            <figcaption class="mb-2 flex items-center justify-between gap-2 border-b border-line pb-2">
-              <span class="flex items-center gap-2 truncate">
-                <span class="font-mono text-[11px] font-bold text-accent-ink">FIGMA</span>
-                <span class="truncate text-[11px] font-bold">{featuredWork?.title ?? 'Portfolio'}</span>
-              </span>
-              <span class="shrink-0 rounded-full bg-cream px-2 py-0.5 text-[9px] font-bold text-muted uppercase">
-                {designWork.length} proyectos
-              </span>
-            </figcaption>
-
-            <div class="grid grid-cols-12 items-center gap-2.5">
-              <!-- Proyecto destacado (featured: true en profile.ts) -->
-              {
-                featuredWork && (
-                  <a
-                    href={featuredWork.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    class="group col-span-5 block aspect-[9/14] overflow-hidden rounded-xl bg-linear-to-br from-accent-soft to-accent"
-                  >
-                    {featuredWork.image && (
-                      <img src={featuredWork.image} alt="" class="size-full object-cover transition-transform duration-300 group-hover:scale-105" />
-                    )}
-                    <span class="sr-only">{featuredWork.title} (Behance, se abre en otra pestaña)</span>
-                  </a>
-                )
-              }
-
-              <div class="col-span-7 flex flex-col gap-2">
-                <!-- Tipografía del sitio -->
-                <div class="rounded-xl border border-line bg-cream p-2">
-                  <span class="block text-[8px] font-bold tracking-wider text-muted uppercase">Type scale</span>
-                  <span class="mt-0.5 flex items-baseline gap-1.5">
-                    <span class="text-sm font-black">Aa</span>
-                    <span class="text-[10px] font-bold">Inter</span>
-                    <span class="font-mono text-[8px] text-muted">+ JetBrains Mono</span>
-                  </span>
-                </div>
-                <!-- Paleta: muestras de los tokens de global.css -->
-                <div class="rounded-xl border border-line bg-cream p-2">
-                  <span class="mb-1 block text-[8px] font-bold tracking-wider text-muted uppercase">Palette tokens</span>
-                  <ul class="flex gap-1.5">
-                    {
-                      palette.map((color) => (
-                        <li class="flex flex-col items-center">
-                          <span class={`block size-5 rounded-md border border-line ${color.className}`} aria-hidden="true" />
-                          <span class="mt-0.5 font-mono text-[7px] text-muted">{color.name}</span>
-                        </li>
-                      ))
-                    }
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </figure>
-
-          <!-- Categorías con su cantidad de trabajos -->
-          <ul class="flex gap-2">
-            {
-              designCategories.map((category) => (
-                <li class="bento flex-1 px-2.5 py-2">
-                  <span class="block truncate text-[11px] font-bold">{category}</span>
-                  <span class="font-mono text-[9px] text-muted">
-                    {designWork.filter((work) => work.category === category).length} trabajos
-                  </span>
-                </li>
-              ))
-            }
-          </ul>
-        </div>
+        <!-- IMAGEN: collage con 3 trabajos reales. El primero (destacado) ocupa las dos filas de la izquierda.
+             Cada uno lleva a su proyecto en Behance -->
+        <ul class="mx-auto my-6 grid w-full max-w-md grid-cols-2 grid-rows-2 gap-2.5">
+          {
+            designPreview.map((work, i) => (
+              <li class={i === 0 ? 'row-span-2' : ''}>
+                <a
+                  href={work.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="group block h-full overflow-hidden rounded-2xl border border-line shadow-md"
+                >
+                  <img
+                    src={work.image}
+                    alt=""
+                    class={`size-full object-cover transition-transform duration-300 group-hover:scale-105 ${i === 0 ? 'aspect-[3/4]' : 'aspect-[4/3]'}`}
+                  />
+                  <span class="sr-only">{work.title} (Behance, se abre en otra pestaña)</span>
+                </a>
+              </li>
+            ))
+          }
+        </ul>
 
         <!-- PROYECTOS (vista Design). Filas por categoría.
              @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla.
@@ -345,53 +281,46 @@ const palette = [
          Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
     <div class="@container">
       <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
-        <!-- IMAGEN: editor decorativo + stack en pastillas -->
-        <div class="mx-auto my-6 w-full max-w-md">
-          <!-- Editor inclinado en 3D (ver .tilt abajo) -->
-          <figure class="tilt bento overflow-hidden text-left shadow-xl" aria-label="Fragmento de código de ejemplo">
-            <!-- Barra superior: semáforo + pestañas -->
-            <div class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2">
-              <div class="flex gap-1.5" aria-hidden="true">
-                <span class="size-2 rounded-full bg-dot-red"></span>
-                <span class="size-2 rounded-full bg-dot-yellow"></span>
-                <span class="size-2 rounded-full bg-dot-green"></span>
-              </div>
-              <span class="rounded-md border border-line bg-surface px-2.5 py-0.5 font-mono text-[10px]">renata.config.js</span>
-            </div>
-
-            <!-- Cada .ln es una línea; el número lo pone el CSS con un contador -->
-            <div class="code overflow-x-auto p-3.5 font-mono text-[10.5px] leading-relaxed">
-              <span class="ln text-muted">// Una sola fuente de verdad para la vista</span>
-              <span class="ln"><span class="text-accent-ink">const</span> renata = {'{'}</span>
-              <span class="ln pl-4">role: <span class="text-muted">'frontend + multimedia'</span>,</span>
-              <span class="ln pl-4">stack: [{stack.code.slice(0, 3).map((s, i) => <><span class="text-muted">'{s}'</span>{i < 2 ? ', ' : ''}</>)}],</span>
-              <span class="ln">{'};'}</span>
-              <span class="ln"></span>
-              <span class="ln"><span class="text-accent-ink">function</span> setView(view) {'{'}</span>
-              <span class="ln pl-4">document.documentElement.dataset.view = view;</span>
-              <span class="ln">{'}'}</span>
-            </div>
-
-            <!-- Barra de estado -->
-            <div class="flex justify-between border-t border-line bg-cream px-3.5 py-1 font-mono text-[9px] text-muted">
-              <span>UTF-8 • JavaScript</span>
-              <span>Git (main)</span>
-            </div>
-          </figure>
-
-          <!-- Stack técnico en pastillas -->
-          <ul class="mt-4 flex flex-wrap justify-center gap-2" aria-label="Stack técnico">
-            {
-              stack.code.map((tech) => (
-                <li class="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[11px] font-medium shadow-sm">{tech}</li>
-              ))
-            }
-          </ul>
-        </div>
+        <!-- IMAGEN: ventana de navegador con la captura de un sitio mío publicado (featured en profile.ts).
+             Toda la ventana es un link al sitio real. Inclinada en 3D en desktop (ver .tilt abajo) -->
+        {
+          featuredSite && (
+            <a
+              href={featuredSite.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="tilt bento group mx-auto my-6 block w-full max-w-md overflow-hidden text-left shadow-xl"
+            >
+              <!-- Barra del navegador: semáforo + dirección del sitio -->
+              <span class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2" aria-hidden="true">
+                <span class="flex gap-1.5">
+                  <span class="size-2 rounded-full bg-dot-red"></span>
+                  <span class="size-2 rounded-full bg-dot-yellow"></span>
+                  <span class="size-2 rounded-full bg-dot-green"></span>
+                </span>
+                <span class="flex-1 truncate rounded-md border border-line bg-surface px-2.5 py-0.5 font-mono text-[10px] text-muted">
+                  {new URL(featuredSite.url).hostname}
+                </span>
+              </span>
+              <img src={featuredSite.image} alt="" class="aspect-[16/10] w-full object-cover object-top" />
+              <span class="sr-only">{featuredSite.title}: {featuredSite.type} (se abre en otra pestaña)</span>
+            </a>
+          )
+        }
 
         <!-- PROYECTOS (vista Code): una sola lista con los de profile.ts + los de la API de GitHub -->
         <div class="more my-8">
           <DynamicApiWidget user={profile.github} projects={projects} />
+
+          <!-- Tecnologías: solo dentro de esta vista (a un cliente en la portada no le dicen nada) -->
+          <p class="eyebrow mt-8">Con qué trabajo</p>
+          <ul class="mt-3 flex flex-wrap gap-2" aria-label="Tecnologías">
+            {
+              stack.code.map((tech) => (
+                <li class="rounded-full border border-line bg-surface px-3 py-1 font-mono text-[11px] font-medium">{tech}</li>
+              ))
+            }
+          </ul>
         </div>
       </div>
     </div>
@@ -529,29 +458,7 @@ const palette = [
 </script>
 
 <style>
-  /* ---------- Números de línea del editor ----------
-     counter-reset arranca el contador en 0; cada .ln le suma 1 y lo muestra
-     con ::before. Así no hay que escribir los números a mano. */
-  .code { counter-reset: line; }
-  .ln {
-    display: block;
-    min-height: 1lh; /* las líneas vacías también ocupan su renglón */
-    white-space: nowrap; /* cada línea en un solo renglón (scroll horizontal si no entra) */
-    counter-increment: line;
-  }
-  .ln::before {
-    content: counter(line);
-    display: inline-block;
-    width: 1.5rem;
-    margin-right: 1rem;
-    text-align: right;
-    color: var(--color-line);
-    user-select: none;
-  }
-  /* Las líneas con sangría (pl-4) mueven el número: lo compensamos */
-  .ln.pl-4::before { margin-left: -1rem; margin-right: 2rem; }
-
-  /* ---------- Editor inclinado (solo desktop y si no se pidió menos movimiento) ---------- */
+  /* ---------- Ventana del navegador inclinada (solo desktop y si no se pidió menos movimiento) ---------- */
   @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
     .tilt {
       transform: perspective(1200px) rotateY(-4deg) rotateX(2deg) scale(0.98);

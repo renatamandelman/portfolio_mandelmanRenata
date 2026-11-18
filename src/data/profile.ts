@@ -75,10 +75,17 @@ export interface Project {
   type: string;
   url: string;
   image?: string; // opcional: portada en /public (si no hay, se ve un degradé)
+  featured?: boolean; // se muestra en la portada de su columna
 }
 
 export const projects: Project[] = [
-  { title: 'Mentes Brillantes', type: 'Landing page', url: 'https://www.mentesbrillantes.com.ar/' },
+  {
+    title: 'Mentes Brillantes',
+    type: 'Landing page',
+    url: 'https://www.mentesbrillantes.com.ar/',
+    image: '/web/mentes-brillantes.jpg', // captura del sitio publicado
+    featured: true,
+  },
   { title: 'Estudio de diseño', type: 'Trabajo práctico', url: 'https://prog3-tp4-ecommerce.vercel.app/' },
 ];
 
@@ -90,7 +97,6 @@ export const projects: Project[] = [
  */
 export interface DesignWork extends Project {
   category: 'Gráfico' | 'UX/UI' | 'Motion';
-  featured?: boolean;
 }
 
 // El orden de esta lista es el orden de las secciones en el panel Design
@@ -277,16 +283,15 @@ const brandCount = new Set(allVideos.map((video) => video.brand)).size;
 export const contentStats = [
   { value: `+${brandCount}`, label: 'Marcas' },
   { value: '2023', label: 'Desde' },
-  { value: `+${allVideos.length}`, label: 'Reels' },
-  { value: `+${designWork.length}`, label: 'Piezas' },
+  { value: `+${allVideos.length}`, label: 'Videos' },
+  { value: `+${designWork.length}`, label: 'Diseños' },
 ];
 
 /**
- * Tarjeta de engagement: mi tasa de engagement promedio (dato de mis estadísticas).
- * `bars` son alturas en % para el mini gráfico: es decorativo, no son datos reales.
+ * Tarjeta de engagement: mi tasa de interacción promedio (dato de mis estadísticas).
+ * "Interacción" en vez de "engagement": que lo entienda cualquiera.
  */
 export const engagement = {
   value: '11,55%',
-  delta: 'Promedio',
-  bars: [35, 60, 45, 95, 75],
+  label: 'Interacción promedio',
 };
