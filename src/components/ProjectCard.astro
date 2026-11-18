@@ -33,7 +33,6 @@ const dialogId = `dialog-${job.id}`;
       {job.company.charAt(0)}
     </span>
     <span class="text-xs leading-tight font-bold">{job.company}</span>
-    {job.videos && <span class="font-mono text-[10px] text-muted">{job.videos.length} videos</span>}
   </button>
 
   <dialog id={dialogId} class="dialog" aria-labelledby={`${dialogId}-title`}>

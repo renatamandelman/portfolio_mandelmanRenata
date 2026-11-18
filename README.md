@@ -111,7 +111,12 @@ Cosas que sé que todavía se pueden mejorar:
 
 ## Créditos y uso de IA
 
-- Tipografías: Inter y JetBrains Mono (SIL Open Font License), vía Fontsource.
+- **Tipografías:** Inter y JetBrains Mono (SIL Open Font License), instaladas con Fontsource.
+- **Videos UGC y de redes:** son trabajos míos para cada marca. Los nombres y productos (La Roche-Posay, Vichy, CeraVe, Maybelline, Cocinarg, entre otras) pertenecen a sus marcas y aparecen solo para mostrar mi trabajo.
+- **Videos de TikTok e Instagram:** se muestran con los reproductores oficiales de cada plataforma (embeds).
+- **Proyectos de diseño:** son míos; las versiones completas están en mi Behance.
+- **Datos de proyectos web:** API pública de GitHub.
+- **Maqueta de referencia de la portada:** hecha con Google Stitch (no usé su código).
 - Uso de IA: ver [Bitácora → Uso de IA](#uso-de-ia).
 
 ---
@@ -164,7 +169,7 @@ Mi primer diseño tenía dos columnas, **Content | Code**, con mi nombre grande 
 - Hice `ProjectCard`: cada marca con la que trabajé es una tarjeta que abre un modal (`<dialog>`) con mis tareas y los videos.
 - Sumé los videos UGC (TikTok, Instagram y videos locales). El reproductor de TikTok recién se carga al tocar play, para que la página no cargue cosas de más.
 - El toggle pasó de 2 a 3 opciones: `[ CONTENT ⇄ DESIGN ⇄ CODE ]`, porque el diseño gráfico y UX/UI también es parte de lo que hago.
-- _(completar: qué más hice y qué problemas tuve estos días)_
+
 
 ---
 
@@ -234,27 +239,51 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
   - cada opción tiene fondo rosado, como un botón, y se pinta al pasar el mouse;
   - al cargar, las tres se iluminan una tras otra (Content → Design → Code) dos veces y se quedan quietas;
   - debajo aparece la pista "Elegí Content, Design o Code para ver cada área", que antes solo se veía en mobile.
+- Completé los créditos del README y el período de mi trabajo freelance (2025 — Presente).
+- Sumé reels y placas de **Mentes Brillantes** y **Gaia** a sus modales. Del código de Instagram solo uso el id de cada publicación: mi componente arma el reproductor y lo carga recién al abrir el modal (si pegaba el script de Instagram, cargaba apenas entrabas a la página).
+- Cargué mi engagement real (11,55%) en la tarjeta de la portada, en vez del valor de ejemplo.
+- Saqué el "N videos" de las tarjetas de cada empresa.
 
 **Decisiones**
+- **Saqué el link "Proyectos" del header.** Apuntaba a los proyectos de Code, que en la portada están ocultos, así que no hacía nada. La forma de llegar a los proyectos es el toggle.
+- **Los números de la portada se calculan solos.** Antes eran valores de ejemplo ("+100 reels", "+300 piezas"). Ahora salen de mis datos: cuántas marcas y videos hay en `experiences` y cuántas piezas en `designWork`. Uso un `Set` para no contar dos veces la misma marca. El "+" es porque muestro una selección: hice más trabajos de los que están en el portfolio.
 - **El link "Experiencia" del header ahora lleva a algo.** 
 - **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
 - **La animación del toggle es solo CSS** (`@keyframes` y un `animation-delay` distinto por opción) y depende de `data-view="all"`, así que no sumé JavaScript ni otra fuente de estado. Cuando elegís una vista desaparece sola. Si la persona tiene activado "reducir movimiento", no se anima.
 
-**Pruebas**
-- Probé la portada a 390px y a 1440px con el toggle nuevo: entra en una línea en mobile y no aparece scroll horizontal.
+
 
 ---
 
 ### Uso de IA
 
-| Tarea | Herramienta | Qué decidí yo | Qué revisé / cambié / descarté |
-| --- | --- | --- | --- |
-| Estructura inicial, config y layout split | Claude | — | _completar: qué entendí, qué modifiqué_ |
-| Rediseño a tres columnas, estado `all`, portada visual | Claude Code (en VS Code) | Las versiones que probé y descarté, la maqueta de referencia, que la portada sea solo imagen y que al tocar cada botón se vean los proyectos. | _completar_ |
-| `DynamicApiWidget` y `ProjectLink` (API de GitHub) | Claude Code | Usar GitHub con topics en vez de cargar los proyectos a mano; qué repos mostrar; juntar todo en una sola lista. | _completar_ |
-| Bug del `@container` en 0px | Claude Code | Lo detecté yo al ver que no aparecían los proyectos de Design. | _completar_ |
-| Redacción de esta bitácora | Claude Code | Pedí que la fuera escribiendo a partir de lo que hacíamos; la reviso y la corrijo yo. | _completar_ |
-| Completar el README (público, componentes, tecnologías, API, responsive, limitaciones) | Claude Code | Que lo escriba de a una sección y en mi voz de estudiante, no como IA; revisé cada parte antes de cada commit; corregí lo de Behance y saqué cosas que sobraban. | _completar_ |
-| Cambio de nombre a "Split View" | Claude Code | Me di cuenta de que "Dual" ya no tenía sentido con tres áreas y elegí el nombre nuevo entre las opciones. | _completar_ |
-| Sección Experiencia y foto en "Sobre mí" | Claude Code | La idea de poner mi CV debajo de "Sobre mí", separarlo en Actual y Terminado, la foto redonda con el texto centrado, sacar las etiquetas de las columnas y los subtítulos nuevos. | _completar_ |
-| Toggle más claro en la portada | Claude Code | Detecté que no se entendía que había que tocarlo; elegí cuáles de las propuestas hacer (botones, animación y pista). | _completar_ |
+Usé dos herramientas, cada una para algo distinto:
+- **Google Stitch:** para armar una maqueta visual de referencia de la portada en tres columnas. Use su codigo como referencia, la tomé como guía y la rehice con mis componentes y mis tokens.
+- **Claude Code** (dentro de VS Code): como asistente mientras programaba.
+
+**Para qué usé Claude Code**
+- Ayudarme a programar con Astro, ya que nunca lo habia utilizado.
+- Resolver dudas y que me explicara partes del código, por ejemplo cómo funcionan las container queries o la API de GitHub.
+- Encontrar la causa de errores, como el `@container` que quedaba en 0px.
+- Ayudarme con las partes más complejas, como el widget de GitHub, el estado `all` de la portada y la animación del toggle.
+- Ordenar y redactar la bitácora y el README a partir de lo que yo iba haciendo y decidiendo.
+
+**Cómo trabajé con ella**
+- En `CLAUDE.md` le dejé reglas fijas: explicarme en español qué cambia antes de editar, hacer cambios chicos, comentar el código en español, no sumar frameworks ni dependencias sin preguntar y usar solo mis colores (tokens).
+- Le pedí que escribiera el README de a una sección, con mi voz de estudiante y no como IA. Revisé cada parte antes de hacer cada commit.
+- Hice commits chicos para poder revisar cada cambio por separado.
+
+**Qué decidí yo**
+- El concepto: una pantalla dividida que se lee desde Content, Design o Code.
+- Las versiones de la portada que probé y descarté, y la maqueta de referencia que armé con Google Stitch.
+- Sumar la columna Design y cambiar el nombre de "Dual View" a "Split View".
+- Que el toggle tenía que entenderse mejor, y cuáles de las propuestas hacer.
+
+**Qué revisé, cambié o descarté**
+- Cada vez que escribia en el Readme, me ocupaba de revisarlo y cambiarlo
+
+
+**Problemas y límites que encontré**
+- **La IA no sabe lo que no le cuento.** A veces escribía cosas que no podía saber, como cómo está configurado el deploy. Por eso revisé todo lo que escribía antes de hacer cada commit.
+- **Detecté errores que la IA no vio,** como que los proyectos de Design desaparecían. Lo vi yo mirando el sitio, y después buscamos juntos la causa.
+- **La IA no puede probar todo por mí.** Las pruebas en mobile las hice yo.

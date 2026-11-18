@@ -156,6 +156,11 @@ export const experiences: Experience[] = [
       'Calendarización y planificación de publicaciones',
     ],
     stack: ['Adobe CC', 'CapCut', 'Figma'],
+    videos: [
+      { brand: 'Mentes Brillantes', title: 'Reel de coaching evolutivo', platform: 'instagram', src: 'DeuskXEivHQ' },
+      { brand: 'Mentes Brillantes', title: 'Reel de tarot evolutivo', platform: 'instagram', src: 'Dc9RXyaCTie' },
+      { brand: 'Mentes Brillantes', title: 'Reel para la comunidad', platform: 'instagram', src: 'DfnUtBFiLgG' },
+    ],
   },
   {
     id: 'cocinargcom',
@@ -188,12 +193,18 @@ export const experiences: Experience[] = [
       'Coordinación con creadores seleccionados para acciones',
     ],
     stack: ['Figma', 'Adobe CC'],
+    // Dos son posts (/p/) y uno es reel: el reproductor de Instagram funciona igual con los dos
+    videos: [
+      { brand: 'Gaia Social Group', title: 'Placa para redes', platform: 'instagram', src: 'DXeifIRjn6x' },
+      { brand: 'Gaia Social Group', title: 'Placa para redes (2)', platform: 'instagram', src: 'DX61A8yDqnc' },
+      { brand: 'Gaia Social Group', title: 'Reel para redes', platform: 'instagram', src: 'DUWzehRDPL6' },
+    ],
   },
   {
     id: 'freelance',
     company: 'Freelance',
     role: 'Creadora de contenido UGC',
-    period: 'Freelance', // ← completar con el período real (ej: '2024 — Presente')
+    period: '2025 — Presente', // primer video UGC: julio 2025 (Maybelline)
     side: 'content',
     tasks: [
       'Videos UGC para marcas de skincare y maquillaje',
@@ -243,18 +254,26 @@ export const stack = {
 
 /**
  * Métricas del lado Content (tarjetas chicas del hero).
- * ⚠️ Los valores marcados como provisorios hay que reemplazarlos por números reales.
+ * Se calculan con los datos de arriba: si sumo un video o una pieza, el número se actualiza solo.
+ * El "+" es porque en el portfolio está una selección: hice más de los que muestro.
  */
+const allVideos = experiences.flatMap((job) => job.videos ?? []);
+// Set: guarda cada marca una sola vez (Vichy tiene dos videos pero cuenta como una marca)
+const brandCount = new Set(allVideos.map((video) => video.brand)).size;
+
 export const contentStats = [
-  { value: '3', label: 'Marcas' }, // Mentes Brillantes, Cocinargcom, Gaia
+  { value: `+${brandCount}`, label: 'Marcas' },
   { value: '2023', label: 'Desde' },
-  { value: '+100', label: 'Reels' }, // ← provisorio
-  { value: '+300', label: 'Piezas' }, // ← provisorio
+  { value: `+${allVideos.length}`, label: 'Reels' },
+  { value: `+${designWork.length}`, label: 'Piezas' },
 ];
 
-/** Tarjeta de engagement: `bars` son alturas en % para el mini gráfico. */
+/**
+ * Tarjeta de engagement: mi tasa de engagement promedio (dato de mis estadísticas).
+ * `bars` son alturas en % para el mini gráfico: es decorativo, no son datos reales.
+ */
 export const engagement = {
-  value: '4.2K', // ← provisorio
-  delta: '+14%', // ← provisorio
+  value: '11,55%',
+  delta: 'Promedio',
   bars: [35, 60, 45, 95, 75],
 };
