@@ -4,8 +4,8 @@ import tailwindcss from '@tailwindcss/vite';
 
 // https://docs.astro.build/en/reference/configuration-reference/
 export default defineConfig({
-  // Cambiar por la URL real una vez hecho el deploy (sirve para sitemap, OG y URLs absolutas).
-  site: 'https://renata-mandelman.vercel.app',
+  // URL publicada en Vercel (sirve para sitemap, OG y URLs absolutas).
+  site: 'https://portfolio-mandelman-renata.vercel.app',
 
   // Sitio 100% estático: el build genera HTML plano en /dist, que Vercel o Netlify sirven sin configuración extra.
   output: 'static',

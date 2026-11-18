@@ -19,4 +19,4 @@ Entrega: 19/11/2026. Defensa individual con modificación de código en vivo: **
 - Colores solo desde los tokens. `accent` (#E09F93) nunca para texto: usar `accent-ink`.
 - Accesibilidad: elementos nativos primero (button, dialog, radio), foco visible, alt en imágenes.
 - Probar a 390px y 1440px.
-- Al cerrar una tarea, proponer una entrada para `docs/proceso.md`.
+- Al cerrar una tarea, sumar la entrada a la Bitácora del `README.md` (primera persona, como estudiante).
