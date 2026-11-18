@@ -264,6 +264,60 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
     white-space: nowrap;
   }
 
+  /* ---------- El hero "se abre" al scrollear ----------
+     animation-timeline: scroll() → la animación no avanza con el tiempo sino con el scroll de la página.
+     animation-range: 0 90vh → empieza arriba de todo y termina cuando bajaste casi una pantalla.
+     Uso translate / rotate / opacity (propiedades sueltas): se suman al transform que ya tienen
+     las cartas, así no pisan el efecto del :hover.
+     @supports: solo si el navegador lo entiende (en Firefox el hero queda quieto, sin romperse).
+     Y solo si la persona no pidió menos movimiento. */
+  @supports (animation-timeline: scroll()) {
+    @media (prefers-reduced-motion: no-preference) {
+      .hero-word,
+      .hero-card,
+      .hero-fan li,
+      .hero-dock {
+        animation-timing-function: linear;
+        animation-fill-mode: both;
+        animation-timeline: scroll(root);
+        animation-range: 0 90vh;
+      }
+      .hero-word { animation-name: word-open; }
+      .hero-stage > .hero-card:first-child { animation-name: card-left; }
+      .hero-stage > .hero-card:last-child { animation-name: card-right; }
+      .hero-fan li:nth-child(1) { animation-name: fan-left; }
+      .hero-fan li:nth-child(2) { animation-name: fan-right; }
+      .hero-fan li:nth-child(3) { animation-name: fan-up; }
+      .hero-dock { animation-name: dock-down; }
+    }
+  }
+
+  /* Las letras se separan y se desvanecen */
+  @keyframes word-open {
+    to { letter-spacing: 0.12em; opacity: 0.2; }
+  }
+  /* Las tarjetas se van hacia los costados */
+  @keyframes card-left {
+    to { translate: -25% 0; opacity: 0; }
+  }
+  @keyframes card-right {
+    to { translate: 25% 0; opacity: 0; }
+  }
+  /* El abanico se abre: las de los costados se separan, la del medio sube */
+  @keyframes fan-left {
+    to { translate: -45% 8%; rotate: -10deg; }
+  }
+  @keyframes fan-right {
+    to { translate: 45% 8%; rotate: 10deg; }
+  }
+  @keyframes fan-up {
+    to { translate: 0 -6%; scale: 1.05; }
+  }
+  /* El dock baja y se desvanece */
+  @keyframes dock-down {
+    to { translate: 0 40%; opacity: 0; }
+  }
+
   /* ---------- Desktop: tarjetas a los costados del abanico ---------- */
   @media (min-width: 1024px) {
     .hero { min-height: 100dvh; justify-content: center; }

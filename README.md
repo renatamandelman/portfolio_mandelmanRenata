@@ -291,6 +291,13 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
   - **Programación:** fondo de puntos, títulos en tipografía mono y bordes punteados, como un plano técnico.
 
   El cambio se anima solo porque `ViewToggle` ya usaba la View Transitions API.
+- **Dentro de un área, solo lo que elegí.** La imagen de portada de cada columna (el celular, el collage, la captura grande) era un "ejemplo" que se repetía con los trabajos. Ahora tiene la clase `.pane-cover` y solo se ve en la portada.
+- **Botón "← Ver las tres áreas"** arriba de cada área. Antes la única forma de volver era tocar mi nombre, que recargaba la página. Para no crear otra fuente de estado, el botón solo tiene `data-show-all`, y el que lo atiende es `ViewToggle`: desmarca los radios, escribe `data-view="all"` y borra la vista guardada.
+- **El hero "se abre" al scrollear** (scroll-driven animations): con `animation-timeline: scroll()` la animación avanza con el scroll y no con el tiempo. Las letras de PORTFOLIO se separan, el abanico se abre y las tarjetas se van hacia los costados. Está adentro de `@supports`: en Firefox, que todavía no lo soporta, el hero se ve quieto y no se rompe. También respeta "reducir movimiento".
+- **Sumé el video de Hogar & Deco** a Redes sociales y saqué de `profile.ts` los tres que borré.
+
+**Problemas**
+- **Probando el botón de volver con Chrome sin pantalla (headless)**, la vista quedaba "un paso atrasada". Era la animación: `startViewTransition` cambia la vista recién cuando el navegador dibuja un cuadro, y sin pantalla casi no dibuja. Con "reducir movimiento" (sin animación) anduvo perfecto, así que la lógica estaba bien. En el navegador normal funciona.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.
