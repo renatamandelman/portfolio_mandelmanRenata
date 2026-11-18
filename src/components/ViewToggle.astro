@@ -1,13 +1,13 @@
 ---
 /**
- * ViewToggle — Segmented control [ CONTENT ⇄ DESIGN ⇄ CODE ]
+ * ViewToggle — Segmented control [ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]
  *
  * Responsabilidad: definir el MODO DE LECTURA de toda la experiencia.
- *   - "content" → foco en Creación de Contenido / RRSS
- *   - "design"  → foco en Diseño gráfico / UX-UI
+ *   - "content" → Redes sociales (videos y contenido)
+ *   - "design"  → Diseño (gráfico, apps y webs, motion)
+ *   - "code"    → Programación (páginas web)
  * Al entrar, <html data-view="all"> (las tres columnas) y no hay ninguna opción marcada:
  * la pastilla aparece recién cuando se elige una.
- *   - "code"    → foco en Desarrollo Web
  * Las flechas ⇄ son decorativas (aria-hidden): solo separan las opciones.
  *
  * Cómo funciona:
@@ -31,9 +31,10 @@ interface Props {
 const { initial, id = 'view-toggle' } = Astro.props;
 
 const options: { value: View; label: string; srLabel: string }[] = [
-  { value: 'content', label: 'Content', srLabel: 'Ver solo creación de contenido' },
-  { value: 'design', label: 'Design', srLabel: 'Ver solo diseño gráfico y UX/UI' },
-  { value: 'code', label: 'Code', srLabel: 'Ver solo desarrollo web' },
+  // value: nombre interno del estado (no cambia). label: lo que lee la gente
+  { value: 'content', label: 'Redes sociales', srLabel: 'Ver mis videos para redes sociales' },
+  { value: 'design', label: 'Diseño', srLabel: 'Ver mis diseños' },
+  { value: 'code', label: 'Programación', srLabel: 'Ver mis páginas web' },
 ];
 ---
 
@@ -94,6 +95,15 @@ const options: { value: View; label: string; srLabel: string }[] = [
   .arrow { color: var(--color-muted); }
   .arrow { padding-inline: 0.15rem; }
 
+  /* Celular: "Redes sociales" y "Programación" son largas. Para que el toggle entre en una línea
+     escondo los corchetes y flechas (son decorativos) y achico un poco el texto */
+  @media (max-width: 480px) {
+    .view-toggle { gap: 0; padding: 0.3rem; font-size: 0.75rem; letter-spacing: 0.04em; }
+    .bracket,
+    .arrow { display: none; }
+    .option { padding: 0.4rem 0.6rem; }
+  }
+
   .track {
     position: relative;
     display: grid;
@@ -111,6 +121,7 @@ const options: { value: View; label: string; srLabel: string }[] = [
     text-align: center;
     transition: color 0.25s var(--ease-out-soft);
     user-select: none;
+    white-space: nowrap; /* "Redes sociales" en un solo renglón */
   }
   .option:hover { color: var(--color-ink); }
 
@@ -170,9 +181,9 @@ const options: { value: View; label: string; srLabel: string }[] = [
 
   const STORAGE_KEY = 'rm-view';
   const MESSAGES: Record<View, string> = {
-    content: 'Vista: creación de contenido',
-    design: 'Vista: diseño gráfico y UX/UI',
-    code: 'Vista: desarrollo web',
+    content: 'Vista: redes sociales',
+    design: 'Vista: diseño',
+    code: 'Vista: programación',
   };
 
   function setView(view: View) {

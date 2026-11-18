@@ -34,7 +34,8 @@ export interface Experience {
 export const profile = {
   name: 'Renata Mandelman',
   location: 'CABA, Buenos Aires, Argentina',
-  tagline: 'Diseñadora multimedial & desarrolladora web',
+  // Frase debajo del nombre: qué hago, dicho para que lo entienda cualquiera
+  tagline: 'Hago videos para redes, diseño y páginas web para marcas y emprendimientos.',
   github: 'renatamandelman', // lo usa también DynamicApiWidget para la API de GitHub
   heroVideo: '7612772716013243656', // id del video del celular del hero (tiene que estar en algún videos[])
   // Foto de la sección "Sobre mí"

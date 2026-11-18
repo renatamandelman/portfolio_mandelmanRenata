@@ -42,9 +42,10 @@ const navLinks = [
 // Las tres vistas, en el mismo orden que el toggle.
 // Se usan para armar los rieles y los botones "Ver …" de cada panel.
 const views = [
-  { id: 'content', label: 'Content' },
-  { id: 'design', label: 'Design' },
-  { id: 'code', label: 'Code' },
+  // cta: el botón de la portada que abre esa área
+  { id: 'content', label: 'Redes sociales', cta: 'Ver mis videos' },
+  { id: 'design', label: 'Diseño', cta: 'Ver mis diseños' },
+  { id: 'code', label: 'Programación', cta: 'Ver mis páginas web' },
 ];
 ---
 
@@ -90,7 +91,7 @@ const views = [
 
       <!-- Pista: solo se ve en la portada (la muestra el CSS según data-view).
            Está dentro de .identity para que en desktop flote junto al nombre y el toggle -->
-      <p class="view-hint px-6 text-center text-xs text-muted">Elegí Content, Design o Code para ver cada área</p>
+      <p class="view-hint px-6 text-center text-xs text-muted">Tocá una opción para ver mis trabajos</p>
     </div>
 
     <!-- SPLIT: tres paneles. Cada uno tiene un riel (se ve cuando el panel está colapsado)
@@ -113,6 +114,12 @@ const views = [
                 {view.id === 'content' && <slot name="content" />}
                 {view.id === 'design' && <slot name="design" />}
                 {view.id === 'code' && <slot name="code" />}
+
+                {/* Portada: botón grande para abrir esta área (en el testeo nadie sabía dónde tocar).
+                    data-go reusa el mismo mecanismo que los rieles: "clickea" el radio del toggle */}
+                <button type="button" data-go={view.id} class="pane-cta">
+                  {view.cta} <span aria-hidden="true">→</span>
+                </button>
 
                 {/* Mobile: al terminar el panel, botones para seguir con las otras vistas */}
                 <nav class="pane-next" aria-label="Otras vistas">
@@ -220,6 +227,23 @@ const views = [
   /* En la vista inicial ya se ven todos los paneles: los botones "Ver …" sobran */
   :global(html[data-view='all']) .pane-next { display: none; }
 
+  /* Botón de la portada para abrir cada área: solo se ve en la vista inicial */
+  .pane-cta {
+    display: none;
+    width: fit-content;
+    margin: 1.5rem auto 0; /* auto a los costados: centrado */
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--radius-pill);
+    background: var(--color-ink);
+    color: var(--color-cream);
+    font-size: 0.875rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.25s var(--ease-out-soft);
+  }
+  .pane-cta:hover { background: var(--color-accent-ink); }
+  :global(html[data-view='all']) .pane-cta { display: block; }
+
   /* El riel solo existe en desktop */
   .rail { display: none; }
 
@@ -282,7 +306,7 @@ const views = [
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
-      padding-top: 15rem; /* lugar para el nombre + toggle que flotan arriba */
+      padding-top: 19rem; /* lugar para el nombre, la frase, el toggle y la pista que flotan arriba */
     }
 
     /* Vista inicial: las tres columnas iguales (los valores por defecto de arriba).
