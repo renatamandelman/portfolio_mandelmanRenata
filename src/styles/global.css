@@ -61,10 +61,11 @@
     position: fixed;
     inset: 0;
     z-index: -1;
+    /* --bg-edge: el color de los bordes del degradé. Cada "lente" lo cambia (ver abajo) */
     background: radial-gradient(
       120% 90% at 50% 20%,
       color-mix(in srgb, var(--color-accent-soft) 50%, white),
-      color-mix(in srgb, var(--color-accent) 35%, var(--color-cream))
+      var(--bg-edge, color-mix(in srgb, var(--color-accent) 35%, var(--color-cream)))
     );
   }
 
@@ -119,4 +120,57 @@
   clip: rect(0 0 0 0);
   white-space: nowrap;
   &:focus { position: static; width: auto; height: auto; clip: auto; }
+}
+
+/* ==========================================================================
+   LENTES: cada área cambia la mirada de toda la página
+   Leen el mismo <html data-view> que escribe ViewToggle (no hay otra fuente de estado).
+   Van fuera de @layer para ganarle a las utilidades de Tailwind (ej: font-display).
+   El cambio se anima solo: ViewToggle usa la View Transitions API (fundido de toda la página).
+   ========================================================================== */
+
+/* Capa extra para las guías de cada lente (grilla o puntos). Arranca vacía */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none; /* no bloquea clics */
+}
+
+/* --- Redes sociales: "feed". Fondo más vivo y un aro de color en cada video, como las historias --- */
+html[data-view='content'] {
+  --bg-edge: color-mix(in srgb, var(--color-accent) 65%, var(--color-cream));
+}
+html[data-view='content'] .pane--content .thumb {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+/* --- Diseño: "Figma". Grilla de 12 columnas de fondo y marco de selección al pasar el mouse --- */
+html[data-view='design'] body::after {
+  /* 12 franjas: cada una es transparente con una línea fina al final */
+  background: repeating-linear-gradient(
+    to right,
+    transparent 0 calc(100% / 12 - 1px),
+    color-mix(in srgb, var(--color-accent-ink) 12%, transparent) calc(100% / 12 - 1px) calc(100% / 12)
+  );
+}
+html[data-view='design'] .pane--design a.bento:hover {
+  outline: 1.5px solid var(--color-accent-ink);
+  outline-offset: 4px;
+}
+
+/* --- Programación: "plano técnico". Fondo de puntos, títulos en mono y bordes punteados --- */
+html[data-view='code'] body::after {
+  background-image: radial-gradient(color-mix(in srgb, var(--color-accent-ink) 25%, transparent) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+html[data-view='code'] .font-display {
+  font-family: var(--font-mono);
+  letter-spacing: -0.04em;
+}
+html[data-view='code'] .pane--code a.bento {
+  border-style: dashed;
+  border-color: var(--color-accent-ink);
 }

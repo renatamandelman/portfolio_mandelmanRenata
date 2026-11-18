@@ -1,0 +1,46 @@
+---
+/**
+ * BrowserCard — Captura de un sitio mío dentro de una "ventana de navegador".
+ *
+ * Responsabilidad: mostrar un proyecto web como se ve de verdad, y que toda la ventana
+ * sea un link al sitio publicado. Lo uso en la portada (grande e inclinado) y en la
+ * vista Programación (cuadrados). Por eso es un componente: el mismo markup en dos lugares.
+ */
+import type { Project } from '../data/profile';
+
+interface Props {
+  project: Project;
+  /** Proporción de la captura: '16/10' en la portada, '1/1' (cuadrado) en la grilla */
+  ratio?: '16/10' | '1/1';
+  /** Clases extra desde afuera (por ejemplo, la inclinación de la portada) */
+  class?: string;
+}
+
+const { project, ratio = '16/10', class: extraClass = '' } = Astro.props;
+---
+
+<a
+  href={project.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class={`bento group block overflow-hidden text-left shadow-xl ${extraClass}`}
+>
+  <!-- Barra del navegador: semáforo + dirección del sitio (decorativa) -->
+  <span class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2" aria-hidden="true">
+    <span class="flex gap-1.5">
+      <span class="size-2 rounded-full bg-dot-red"></span>
+      <span class="size-2 rounded-full bg-dot-yellow"></span>
+      <span class="size-2 rounded-full bg-dot-green"></span>
+    </span>
+    <span class="flex-1 truncate rounded-md border border-line bg-surface px-2.5 py-0.5 font-mono text-[10px] text-muted">
+      {new URL(project.url).hostname}
+    </span>
+  </span>
+  <img
+    src={project.image}
+    alt=""
+    class="w-full object-cover object-top transition-transform duration-300 group-hover:scale-[1.02]"
+    style={`aspect-ratio: ${ratio}`}
+  />
+  <span class="sr-only">{project.title}: {project.type} (se abre en otra pestaña)</span>
+</a>

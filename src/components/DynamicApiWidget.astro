@@ -7,12 +7,13 @@
  * y una URL en "Website" (el deploy de Vercel). Para sumar un proyecto al
  * portfolio alcanza con completar esos dos campos en GitHub.
  *
- * Los proyectos de profile.ts se ven siempre (no dependen de la API);
- * los de GitHub se agregan al final de la misma lista.
+ * Si recibe projects (profile.ts), van primero y se ven aunque falle la API.
+ * exclude: sitios que ya se muestran en otro lado de la página, para no repetirlos.
  *
  * Estados (atributo data-state, se ve uno a la vez debajo de la lista):
  *   loading → "Cargando más proyectos…"
- *   done    → la API respondió (con o sin repos nuevos): no se muestra nada
+ *   done    → la API respondió y hay proyectos en la lista: no se muestra nada
+ *   empty   → la API respondió pero no quedó ningún proyecto para mostrar
  *   error   → sin conexión, límite de la API o error de GitHub (con botón Reintentar)
  *
  * Límite: sin token, GitHub permite 60 pedidos por hora por IP.
@@ -28,13 +29,17 @@ interface Props {
   topic?: string;
   /** Proyectos fijos (profile.ts): van primero y se ven aunque falle la API */
   projects?: Project[];
+  /** URLs de sitios que ya están en la página: si un repo apunta a uno de estos, no se repite */
+  exclude?: string[];
 }
 
-const { user, topic = 'portfolio', projects = [] } = Astro.props;
+const { user, topic = 'portfolio', projects = [], exclude = [] } = Astro.props;
+// Solo el dominio (ej: "casting-flow.vercel.app"): así se comparan sin importar la barra final
+const excludeHosts = exclude.map((url) => new URL(url).hostname).join(',');
 ---
 
 <!-- Los datos van en data-*: el script corre en el navegador y no ve las variables de arriba -->
-<div data-github-widget data-user={user} data-topic={topic} aria-busy="true">
+<div data-github-widget data-user={user} data-topic={topic} data-exclude={excludeHosts} aria-busy="true">
   <ul class="grid gap-2" aria-label="Proyectos web" data-list>
     {projects.map((project) => <ProjectLink url={project.url} type={project.type} title={project.title} />)}
   </ul>
@@ -42,6 +47,7 @@ const { user, topic = 'portfolio', projects = [] } = Astro.props;
   <!-- aria-live: los lectores de pantalla anuncian cuando cambia el estado -->
   <div aria-live="polite">
     <p data-state="loading" class="mt-3 text-xs text-muted">Cargando más proyectos…</p>
+    <p data-state="empty" class="mt-3 text-xs text-muted" hidden>Por ahora no hay más proyectos para mostrar.</p>
 
     <div data-state="error" class="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted md:justify-end" hidden>
       <p data-error-message>No se pudieron cargar más proyectos.</p>
@@ -72,11 +78,14 @@ const { user, topic = 'portfolio', projects = [] } = Astro.props;
     const template = widget.querySelector<HTMLTemplateElement>('template[data-item]')!;
     const errorMessage = widget.querySelector<HTMLElement>('[data-error-message]')!;
 
-    // Dominios de los proyectos fijos, para no repetirlos si también están en GitHub
-    const fixedHosts = [...list.querySelectorAll('a')].map((a) => new URL(a.href).hostname);
+    // Dominios que no hay que repetir: los proyectos fijos de la lista + los de exclude
+    const fixedHosts = [
+      ...[...list.querySelectorAll('a')].map((a) => new URL(a.href).hostname),
+      ...(widget.dataset.exclude ? widget.dataset.exclude.split(',') : []),
+    ];
 
     // Muestra un solo estado y oculta los demás ("done" no tiene elemento: oculta todos)
-    const show = (state: 'loading' | 'done' | 'error') => {
+    const show = (state: 'loading' | 'done' | 'empty' | 'error') => {
       widget.querySelectorAll<HTMLElement>('[data-state]').forEach((el) => {
         el.hidden = el.dataset.state !== state;
       });
@@ -123,7 +132,8 @@ const { user, topic = 'portfolio', projects = [] } = Astro.props;
 
       // append: se suman al final, después de los proyectos fijos
       list.append(...selected.map(createItem));
-      show('done');
+      // Si la lista quedó sin nada (ni fijos ni de GitHub), lo decimos en vez de dejar un hueco
+      show(list.children.length > 0 ? 'done' : 'empty');
     }
 
     widget.querySelector('[data-retry]')!.addEventListener('click', load);

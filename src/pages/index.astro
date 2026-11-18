@@ -13,6 +13,7 @@
  */
 import SplitLayout from '../layouts/SplitLayout.astro';
 import Hero from '../components/Hero.astro';
+import BrowserCard from '../components/BrowserCard.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import DynamicApiWidget from '../components/DynamicApiWidget.astro';
 import { embedUrl } from '../utils/embed';
@@ -29,7 +30,10 @@ import {
   areas,
 } from '../data/profile';
 
-const contentWork = experiences.filter((e) => e.side === 'content');
+// Redes sociales: solo los videos que elegí (featured en profile.ts), cada uno con su trabajo
+const featuredVideos = experiences.flatMap((job) =>
+  (job.videos ?? []).filter((video) => video.featured).map((video) => ({ video, job })),
+);
 
 // Portada de Diseño: 3 trabajos con imagen, el destacado (featured) primero
 const designPreview = [...designWork.filter((work) => work.featured), ...designWork.filter((work) => !work.featured)]
@@ -125,11 +129,11 @@ const heroPreviews = [
 
         </div>
 
-        <!-- PROYECTOS (vista Content): marcas con las que trabajé, cada una abre su modal con tareas y videos.
+        <!-- PROYECTOS (vista Redes sociales): los videos que elegí; cada uno abre su modal.
              @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla -->
         <div class="more @container my-8">
-          <ul class="grid grid-cols-2 gap-3 @2xl:grid-cols-4">
-            {contentWork.map((job) => <ProjectCard job={job} />)}
+          <ul class="grid grid-cols-2 gap-4 @2xl:grid-cols-4">
+            {featuredVideos.map(({ video, job }) => <ProjectCard video={video} job={job} />)}
           </ul>
         </div>
       </div>
@@ -186,8 +190,9 @@ const heroPreviews = [
         <div class="more @container mx-auto my-8 w-full max-w-5xl text-left">
         {
           designCategories.map((category) => {
-            // Trabajos de esta categoría; si no hay ninguno, no se dibuja la fila
-            const works = designWork.filter((work) => work.category === category);
+            // Trabajos de esta categoría: solo los que tienen imagen, y como mucho 2
+            // (elegí mostrar poco: a la gente no le interesa ver todo). Si no hay ninguno, no se dibuja la fila
+            const works = designWork.filter((work) => work.category === category && work.image).slice(0, 2);
             return (
               works.length > 0 && (
                 <section
@@ -199,10 +204,10 @@ const heroPreviews = [
                     {/* Cantidad de trabajos con dos dígitos: 2 → "02" */}
                     <span class="font-mono text-[11px]">{String(works.length).padStart(2, '0')}</span>
                   </h3>
-                  {/* Panel angosto (mobile): carrusel horizontal (scroll-snap) que llega hasta el borde */}
-                  <ul class="-mx-6 flex snap-x snap-mandatory scroll-px-6 gap-3 overflow-x-auto px-6 pb-2 @sm:mx-0 @sm:grid @sm:grid-cols-2 @sm:gap-4 @sm:overflow-visible @sm:px-0 @sm:pb-0 @3xl:grid-cols-3">
+                  {/* Dos tarjetas chicas lado a lado (max-w-lg: no se estiran en pantallas grandes) */}
+                  <ul class="grid max-w-lg grid-cols-2 gap-3">
                     {works.map((work) => (
-                      <li class="w-[70%] shrink-0 snap-start @sm:w-auto">
+                      <li>
                         <a
                           href={work.url}
                           target="_blank"
@@ -256,41 +261,31 @@ const heroPreviews = [
       <p class="mt-2 text-sm text-muted md:text-base">Páginas web que se ven bien en el celular</p>
     </header>
 
-    <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
-         Panel angosto (inicio, mobile) → uno debajo del otro.
-         Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
+    <!-- @container: la grilla de proyectos se acomoda al ancho del PANEL, no al de la pantalla -->
     <div class="@container">
-      <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
-        <!-- IMAGEN: ventana de navegador con la captura de un sitio mío publicado (featured en profile.ts).
-             Toda la ventana es un link al sitio real. Inclinada en 3D en desktop (ver .tilt abajo) -->
-        {
-          featuredSite && (
-            <a
-              href={featuredSite.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="tilt bento group mx-auto my-5 block w-full max-w-md overflow-hidden text-left shadow-xl"
-            >
-              <!-- Barra del navegador: semáforo + dirección del sitio -->
-              <span class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2" aria-hidden="true">
-                <span class="flex gap-1.5">
-                  <span class="size-2 rounded-full bg-dot-red"></span>
-                  <span class="size-2 rounded-full bg-dot-yellow"></span>
-                  <span class="size-2 rounded-full bg-dot-green"></span>
-                </span>
-                <span class="flex-1 truncate rounded-md border border-line bg-surface px-2.5 py-0.5 font-mono text-[10px] text-muted">
-                  {new URL(featuredSite.url).hostname}
-                </span>
-              </span>
-              <img src={featuredSite.image} alt="" class="aspect-[16/10] w-full object-cover object-top" />
-              <span class="sr-only">{featuredSite.title}: {featuredSite.type} (se abre en otra pestaña)</span>
-            </a>
-          )
-        }
+      <div>
+        <!-- IMAGEN de la portada: un sitio mío (featured en profile.ts), inclinado en 3D en desktop (ver .tilt abajo).
+             En la vista Programación se esconde (.code-cover): los cuadrados de abajo ya lo muestran -->
+        {featuredSite && <BrowserCard project={featuredSite} class="tilt code-cover mx-auto my-5 w-full max-w-md" />}
 
-        <!-- PROYECTOS (vista Code): una sola lista con los de profile.ts + los de la API de GitHub -->
+        <!-- PROYECTOS (vista Programación) -->
         <div class="more my-8">
-          <DynamicApiWidget user={profile.github} projects={projects} />
+          <!-- Los que elegí mostrar, en cuadrados con la captura de cada sitio -->
+          <ul class="grid gap-5 @xl:grid-cols-2 @4xl:grid-cols-3">
+            {
+              projects.map((project) => (
+                <li>
+                  <BrowserCard project={project} ratio="1/1" />
+                  <p class="mt-3 text-sm font-bold">{project.title}</p>
+                  <p class="text-xs text-muted">{project.type}</p>
+                </li>
+              ))
+            }
+          </ul>
+
+          <!-- Más proyectos desde la API de GitHub (sin repetir los de arriba: exclude) -->
+          <p class="eyebrow mt-10 mb-3">Más proyectos, desde mi GitHub</p>
+          <DynamicApiWidget user={profile.github} exclude={projects.map((project) => project.url)} />
 
           <!-- Tecnologías: solo dentro de esta vista (a un cliente en la portada no le dicen nada) -->
           <p class="eyebrow mt-8">Con qué trabajo</p>
@@ -407,14 +402,18 @@ const heroPreviews = [
 </script>
 
 <style>
+  /* En la vista Programación la captura grande sobra: abajo están los cuadrados */
+  :global(html[data-view='code']) :global(.code-cover) { display: none; }
+
   /* ---------- Ventana del navegador inclinada (solo desktop y si no se pidió menos movimiento) ---------- */
   @media (min-width: 900px) and (prefers-reduced-motion: no-preference) {
-    .tilt {
+    /* :global porque .tilt se aplica a BrowserCard (otro componente): el CSS con scope no le llegaría */
+    :global(.tilt) {
       transform: perspective(1200px) rotateY(-4deg) rotateX(2deg) scale(0.98);
       transform-origin: center right;
       transition: transform 0.4s var(--ease-out-soft);
     }
-    .tilt:hover {
+    :global(.tilt:hover) {
       transform: perspective(1200px) rotateY(-1deg) rotateX(1deg) scale(1);
     }
   }

@@ -17,7 +17,8 @@ export interface Video {
   title: string;
   platform: 'local' | 'tiktok' | 'instagram';
   src: string;
-  poster?: string;
+  poster?: string; // portada: captura del primer cuadro, guardada en public/videos/
+  featured?: boolean; // se muestra en la vista Redes sociales (elegí solo algunos)
 }
 
 export interface Experience {
@@ -71,7 +72,7 @@ export const socials = [
   { label: 'Behance', href: 'https://www.behance.net/renatamandelman' },
 ];
 
-/** Proyectos web del lado code: cada uno es un link al sitio publicado. */
+/** Proyectos web que elegí mostrar (vista Programación): cada uno es un link al sitio publicado. */
 export interface Project {
   title: string;
   type: string;
@@ -88,7 +89,18 @@ export const projects: Project[] = [
     image: '/web/mentes-brillantes.jpg', // captura del sitio publicado
     featured: true,
   },
-  { title: 'Estudio de diseño', type: 'Trabajo práctico', url: 'https://prog3-tp4-ecommerce.vercel.app/' },
+  {
+    title: 'Estudio de diseño',
+    type: 'Trabajo práctico',
+    url: 'https://prog3-tp4-ecommerce.vercel.app/',
+    image: '/web/estudio-de-diseno.jpg',
+  },
+  {
+    title: 'Keipana Accesorios',
+    type: 'Sitio de cursos',
+    url: 'https://keipana-accesorios-academy.vercel.app/',
+    image: '/web/keipana.jpg',
+  },
 ];
 
 /**
@@ -198,7 +210,7 @@ export const experiences: Experience[] = [
     videos: [
       { brand: 'Cocinarg', title: 'Recetas argentinas', platform: 'instagram', src: 'DXNBl4nh0HQ' },
       { brand: 'Cocinarg', title: 'Legumbres y más', platform: 'instagram', src: 'DXsDpdvEcET' },
-      { brand: 'Muydinnette', title: 'Recetas y contenido', platform: 'instagram', src: 'DVHPz5akRxy' },
+      { brand: 'Muydinnette', title: 'Recetas y contenido', platform: 'instagram', src: 'DVHPz5akRxy', poster: '/videos/muydinnette-recetas.jpg', featured: true },
       { brand: 'Funga', title: 'Contenido de recetas', platform: 'instagram', src: 'DUoufEVEYMu' },
     ],
   },
@@ -216,7 +228,7 @@ export const experiences: Experience[] = [
     stack: ['Figma', 'Adobe CC'],
     // Dos son posts (/p/) y uno es reel: el reproductor de Instagram funciona igual con los dos
     videos: [
-      { brand: 'Gaia Social Group', title: 'Placa para redes', platform: 'instagram', src: 'DXeifIRjn6x' },
+      { brand: 'Gaia Social Group', title: 'Placa para redes', platform: 'instagram', src: 'DXeifIRjn6x', poster: '/videos/gaia-placa.jpg', featured: true },
       { brand: 'Gaia Social Group', title: 'Placa para redes (2)', platform: 'instagram', src: 'DX61A8yDqnc' },
       { brand: 'Gaia Social Group', title: 'Reel para redes', platform: 'instagram', src: 'DUWzehRDPL6' },
     ],
@@ -235,8 +247,8 @@ export const experiences: Experience[] = [
     videos: [
       { brand: 'La Roche-Posay', title: 'Anthelios DermoPediátrico SPF50+', platform: 'tiktok', src: '7627963069204843796' },
       { brand: 'Vichy', title: 'Liftactiv Collagen Specialist 16', platform: 'tiktok', src: '7614635631154613522' },
-      { brand: 'Vichy', title: 'Protector solar', platform: 'tiktok', src: '7612772716013243656', poster: '/videos/vichy-protector-solar.jpg' }, // ← video del hero (el poster es la portada del celular)
-      { brand: 'CeraVe', title: 'Limpiador + Loción Humectante', platform: 'tiktok', src: '7611574593475693842' },
+      { brand: 'Vichy', title: 'Protector solar', platform: 'tiktok', src: '7612772716013243656', poster: '/videos/vichy-protector-solar.jpg', featured: true }, // ← video del hero (el poster es la portada del celular)
+      { brand: 'CeraVe', title: 'Limpiador + Loción Humectante', platform: 'tiktok', src: '7611574593475693842', poster: '/videos/cerave-limpiador.jpg', featured: true },
       { brand: 'Maybelline', title: 'Tattoo Liner 48H', platform: 'tiktok', src: '7530338466295516434' },
       { brand: 'Hogar & Deco', title: 'Antes y después con almohadones', platform: 'local', src: '/videos/hogar-antes-y-despues.mp4', poster: '/videos/hogar-antes-y-despues.jpg' },
       { brand: 'Hogar & Deco', title: 'Cubresillas', platform: 'local', src: '/videos/hogar-cubresillas.mp4', poster: '/videos/hogar-cubresillas.jpg' },

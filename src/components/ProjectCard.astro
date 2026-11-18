@@ -1,9 +1,10 @@
 ---
 /**
- * ProjectCard — Tarjeta de una experiencia + modal "Case Study".
+ * ProjectCard — Tarjeta de un video elegido + modal con el video y el contexto del trabajo.
  *
- * Responsabilidad: mostrar la marca como un botón y, al tocarlo, abrir un
- * <dialog> con el puesto, las tareas y (si tiene) los videos.
+ * Responsabilidad: mostrar la pieza como un botón (portada vertical, marca y título) y,
+ * al tocarlo, abrir un <dialog> con el video y para quién lo hice (empresa, puesto, tareas).
+ * Solo se usan los videos con featured: true en profile.ts: a la gente no le interesa ver todo.
  *
  * Por qué <dialog>:
  *   - showModal() bloquea el resto de la página y mueve el foco adentro.
@@ -11,108 +12,111 @@
  *
  * Videos de TikTok / Instagram: son <iframe> con data-src en vez de src.
  * El script les pone el src recién al abrir el modal → la página no carga
- * nada de TikTok ni Instagram hasta que alguien quiere ver los videos.
+ * nada de TikTok ni Instagram hasta que alguien quiere ver el video.
  */
-import type { Experience } from '../data/profile';
+import type { Experience, Video } from '../data/profile';
 import { embedUrl } from '../utils/embed';
 
 interface Props {
+  video: Video;
+  /** El trabajo al que pertenece el video (para el contexto del modal) */
   job: Experience;
 }
 
-const { job } = Astro.props;
-const dialogId = `dialog-${job.id}`;
+const { video, job } = Astro.props;
+const dialogId = `dialog-${video.src.replace(/[^a-zA-Z0-9]/g, '')}`; // id válido aunque src sea una ruta
 ---
 
 <li>
-  <button type="button" class="card bento" data-open={dialogId} aria-haspopup="dialog">
-    <span
-      class="flex size-9 items-center justify-center rounded-full bg-accent-soft text-sm font-bold text-accent-ink"
-      aria-hidden="true"
-    >
-      {job.company.charAt(0)}
+  <button type="button" class="card" data-open={dialogId} aria-haspopup="dialog">
+    <!-- Portada vertical: la imagen si hay, si no un degradé con la inicial de la marca -->
+    <span class="thumb" aria-hidden="true">
+      {video.poster ? <img src={video.poster} alt="" /> : <span class="initial font-display">{video.brand.charAt(0)}</span>}
+      <span class="play">▶</span>
     </span>
-    <span class="text-xs leading-tight font-bold">{job.company}</span>
+    <span class="mt-2 block text-sm leading-tight font-bold">{video.brand}</span>
+    <span class="block text-xs text-muted">{video.title}</span>
   </button>
 
   <dialog id={dialogId} class="dialog" aria-labelledby={`${dialogId}-title`}>
     <!-- La caja interna lleva el padding: así un clic en el fondo "cae" en el <dialog> y lo cerramos -->
-    <div class="p-6 md:p-8">
-      <header class="flex items-start justify-between gap-4">
-        <div>
-          <p class="font-mono text-xs text-muted">{job.period}</p>
-          <h3 id={`${dialogId}-title`} class="mt-1 text-2xl font-extrabold tracking-tight uppercase">{job.company}</h3>
-          <p class="text-sm text-muted">{job.role}</p>
-        </div>
-        <!-- method="dialog": el formulario cierra el modal sin JavaScript -->
-        <form method="dialog">
-          <button class="close" aria-label="Cerrar">✕</button>
-        </form>
-      </header>
-
-      <ul class="mt-5 list-disc space-y-1 pl-5 text-sm">
-        {job.tasks.map((task) => <li>{task}</li>)}
-      </ul>
-
-      <ul class="mt-4 flex flex-wrap gap-1.5">
-        {job.stack.map((tool) => <li class="rounded-full bg-accent-soft px-2.5 py-1 text-xs">{tool}</li>)}
-      </ul>
-
+    <div class="grid gap-6 p-6 md:grid-cols-[minmax(0,20rem)_1fr] md:p-8">
       {
-        job.videos && (
-          <ul class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {job.videos.map((video) => (
-              <li>
-                <figure>
-                  {video.platform === 'local' ? (
-                    <video
-                      class="media"
-                      src={video.src}
-                      poster={video.poster}
-                      controls
-                      playsinline
-                      preload="none"
-                    />
-                  ) : (
-                    <iframe
-                      class="media"
-                      data-src={embedUrl(video)}
-                      title={`${video.brand}: ${video.title}`}
-                      allow="encrypted-media; fullscreen; picture-in-picture"
-                      loading="lazy"
-                    />
-                  )}
-                  <figcaption class="mt-2 text-sm">
-                    <span class="font-bold">{video.brand}</span>
-                    <span class="text-muted"> · {video.title}</span>
-                  </figcaption>
-                </figure>
-              </li>
-            ))}
-          </ul>
+        video.platform === 'local' ? (
+          <video class="media" src={video.src} poster={video.poster} controls playsinline preload="none" />
+        ) : (
+          <iframe
+            class="media"
+            data-src={embedUrl(video)}
+            title={`${video.brand}: ${video.title}`}
+            allow="encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+          />
         )
       }
+
+      <div>
+        <header class="flex items-start justify-between gap-4">
+          <div>
+            <h3 id={`${dialogId}-title`} class="font-display text-2xl font-bold tracking-tight">{video.brand}</h3>
+            <p class="text-sm text-muted">{video.title}</p>
+          </div>
+          <!-- method="dialog": el formulario cierra el modal sin JavaScript -->
+          <form method="dialog">
+            <button class="close" aria-label="Cerrar">✕</button>
+          </form>
+        </header>
+
+        <!-- Contexto: para quién y qué hice -->
+        <p class="mt-6 text-sm"><span class="font-bold">{job.company}</span> · {job.role}</p>
+        <ul class="mt-2 list-disc space-y-1 pl-5 text-sm">
+          {job.tasks.map((task) => <li>{task}</li>)}
+        </ul>
+      </div>
     </div>
   </dialog>
 </li>
 
 <style>
   .card {
-    display: flex;
+    display: block;
     width: 100%;
-    height: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.375rem;
-    padding: 0.75rem;
-    text-align: center;
+    text-align: left;
     cursor: pointer;
-    transition: border-color 0.2s, transform 0.2s var(--ease-out-soft);
   }
-  .card:hover { border-color: var(--color-accent); transform: translateY(-2px); }
+
+  /* Portada en formato vertical (9:16), como se ve en el celular */
+  .thumb {
+    position: relative;
+    display: grid;
+    place-items: center;
+    aspect-ratio: 9 / 16;
+    overflow: hidden;
+    border: 1px solid var(--color-line);
+    border-radius: var(--radius-bento);
+    background: linear-gradient(160deg, var(--color-accent-soft), var(--color-accent));
+    transition: transform 0.25s var(--ease-out-soft), box-shadow 0.25s var(--ease-out-soft);
+  }
+  .card:hover .thumb { transform: translateY(-3px); box-shadow: 0 16px 30px -18px rgb(24 24 27 / 0.45); }
+  .thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .initial { font-size: 3rem; font-weight: 800; color: var(--color-accent-ink); }
+
+  /* Botón de play decorativo en el centro de la portada */
+  .play {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    padding-left: 0.2rem;
+    border-radius: 50%;
+    background: color-mix(in srgb, white 90%, transparent);
+    color: var(--color-ink);
+    font-size: 0.9rem;
+  }
 
   .dialog {
-    width: min(100% - 2rem, 64rem);
+    width: min(100% - 2rem, 52rem);
     max-height: 90dvh;
     margin: auto;
     padding: 0;
@@ -138,7 +142,7 @@ const dialogId = `dialog-${job.id}`;
   }
   .close:hover { border-color: var(--color-ink); }
 
-  /* Videos e iframes en formato vertical (9:16), como se ven en el celular */
+  /* Video o iframe en formato vertical (9:16) */
   .media {
     display: block;
     width: 100%;
@@ -158,13 +162,13 @@ const dialogId = `dialog-${job.id}`;
     const iframes = dialog.querySelectorAll<HTMLIFrameElement>('iframe[data-src]');
 
     button.addEventListener('click', () => {
-      // Recién ahora cargamos los reproductores de TikTok / Instagram
+      // Recién ahora cargamos el reproductor de TikTok / Instagram
       iframes.forEach((iframe) => { iframe.src = iframe.dataset.src!; });
       dialog.showModal();
     });
 
     dialog.addEventListener('close', () => {
-      // Al cerrar, frenamos todo: pausamos los .mp4 y descargamos los iframes
+      // Al cerrar, frenamos todo: pausamos el .mp4 y descargamos el iframe
       dialog.querySelectorAll('video').forEach((video) => video.pause());
       iframes.forEach((iframe) => iframe.removeAttribute('src'));
     });

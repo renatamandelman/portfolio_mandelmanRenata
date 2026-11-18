@@ -36,13 +36,15 @@ npm run preview    # sirve /dist localmente para probar el build
 
 ## Componentes propios
 
-**`ViewToggle.astro`**: es el botón `[ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]` y el foco del sitio. Cuando elegís una opción, guarda cuál es en `<html data-view>` y el CSS cambia la pantalla según eso. Lo hice con radios en vez de botones porque así ya funciona con teclado y con lectores de pantalla sin que yo tenga que programarlo. También se acuerda de la última vista que elegiste (con `localStorage`). Cuando entrás por primera vez no hay ninguna opción marcada y ves la portada con las tres columnas.
+**`ViewToggle.astro`**: guarda qué área se está viendo (Redes sociales, Diseño o Programación) en `<html data-view>`, y el CSS cambia la pantalla según eso. Son radios en vez de botones porque así funciona con teclado y con lectores de pantalla sin programarlo aparte. Se acuerda de la última vista (con `localStorage`). Después del testeo escondí la barra: se navega con las pastillas del hero, los botones "Ver mis…" y los rieles, que "clickean" estos radios. Los radios siguen en la página y la barra aparece si alguien llega con Tab, así nunca hay un foco invisible.
 
 **`Hero.astro`**: es la presentación de arriba de todo. Muestra "PORTFOLIO" gigante, mi nombre, un abanico con tres trabajos reales (uno de cada área), una tarjeta con lo que hago y otra con las tres áreas como botones, y abajo un dock con mis herramientas. Recibe todo por props desde `profile.ts` y no guarda estado: los botones de las áreas usan `data-go`, el mismo mecanismo que los rieles, que "clickea" el radio del toggle. Lo separé en un componente porque tiene una responsabilidad clara (presentarme) y mucho CSS propio.
 
-**`ProjectCard.astro`**: es la tarjeta de cada marca con la que trabajé como creadora de contenido. Al tocarla se abre un modal con lo que hice y los videos. Usé `<dialog>` porque ya trae el cierre con Esc y el manejo del foco. Los videos de TikTok se cargan recién cuando tocás play, para que la página no tarde más de lo necesario.
+**`ProjectCard.astro`**: es la tarjeta de cada video que elegí mostrar en Redes sociales (los marcados con `featured: true`). Muestra la portada vertical con la marca y el título, y al tocarla abre un modal con el video y para quién lo hice (empresa, puesto y tareas). Usé `<dialog>` porque ya trae el cierre con Esc y el manejo del foco. El reproductor de TikTok o Instagram se carga recién al abrir el modal, para que la página no tarde más de lo necesario.
 
-**`DynamicApiWidget.astro`**: trae mis proyectos de programación desde la API de GitHub. Muestra solo los repos que tienen el topic `portfolio`, así para sumar un proyecto nuevo no tengo que tocar el código. Mientras carga muestra un aviso, y si la API falla se siguen viendo los proyectos que tengo cargados a mano, con un botón para reintentar.
+**`BrowserCard.astro`**: muestra la captura de un sitio mío dentro de una "ventana de navegador", y toda la ventana es un link al sitio. La uso en la portada (inclinada) y en Programación (cuadrados): por eso la separé, para no repetir el mismo markup.
+
+**`DynamicApiWidget.astro`**: trae mis proyectos de programación desde la API de GitHub. Muestra solo los repos que tienen el topic `portfolio`, así para sumar un proyecto nuevo no tengo que tocar el código. Recibe `exclude` con los sitios que ya muestro en los cuadrados, para no repetirlos. Tiene cuatro estados: cargando, con datos, vacío ("Por ahora no hay más proyectos para mostrar") y error con un botón para reintentar.
 
 **`ProjectLink.astro`**: es el diseño de cada proyecto de la lista. Lo separé en un componente para que los proyectos que escribí yo y los que llegan de GitHub se vean exactamente iguales.
 
@@ -74,12 +76,12 @@ GET https://api.github.com/users/renatamandelman/repos?per_page=100&sort=updated
 
 **Qué información obtengo:** la lista de mis repositorios. De cada uno uso el nombre, la descripción, la URL del sitio publicado (el campo "Website") y los *topics*. Muestro solo los repos que tienen el topic `portfolio` y una URL publicada. Así, para sumar un proyecto al portfolio no toco el código: en GitHub le pongo el topic y el link de Vercel, y aparece solo.
 
-**Cómo se integra:** los proyectos de Code salen de dos lugares. Algunos los cargué a mano en `profile.ts` y se ven siempre. Los de GitHub se suman al final de la misma lista, con la misma tarjeta (`ProjectLink`), así quien visita no nota la diferencia. Si un repo apunta a un sitio que ya está en la lista, no lo repito.
+**Cómo se integra:** en Programación muestro primero tres sitios que elegí, en cuadrados con su captura (`profile.ts`). Debajo, "Más proyectos, desde mi GitHub" lista los repos de la API, sin repetir los de arriba (`exclude`).
 
 **Estados y qué pasa si algo falla:**
 - **Cargando:** mientras espera la respuesta, debajo de la lista aparece "Cargando más proyectos…".
 - **Con datos:** se agregan los proyectos y el aviso desaparece.
-- **Sin proyectos nuevos (vacío):** si GitHub responde pero ningún repo tiene el topic, no muestro ningún error, porque los proyectos de `profile.ts` ya están. La lista nunca queda vacía.
+- **Vacío:** si GitHub responde pero no queda ningún repo para mostrar, aparece "Por ahora no hay más proyectos para mostrar" en vez de un hueco.
 - **Error:** distingo tres casos con mensajes distintos: sin conexión, límite de pedidos (GitHub responde 403) y cualquier otro error de GitHub. En los tres casos los proyectos fijos se siguen viendo y aparece un botón **"Reintentar"**.
 
 **Límites:** sin token, GitHub permite **60 pedidos por hora por IP**. Para un portfolio alcanza, porque cada visita hace un solo pedido. Si se pasa, aviso que hay que probar en un rato. No usé token porque en un sitio estático quedaría visible en el código del navegador.
@@ -280,6 +282,15 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - La lista de áreas (id, texto y botón) pasó a `profile.ts` (`areas`), así el hero y `SplitLayout` usan la misma y no hay que cambiarla en dos lugares.
 - **Paleta verde agua.** Cambié el salmón por tonos verde agua. Como los colores son tokens en `global.css`, cambiar los valores de `accent`, `accent-soft` y `accent-ink` alcanzó para cambiar todo el sitio. Antes de elegirlos medí el contraste: el verde agua va solo de fondo y para texto uso un verde petróleo.
 - **El fondo del hero ahora está en toda la página.** Lo saqué del `Hero` y lo puse en `body::before`, una capa con `position: fixed` detrás de todo: no se estira cuando la página es larga y se ve igual al scrollear. Por eso oscurecí un poco el gris de los textos secundarios.
+- **Mostrar menos, elegido por mí.** A la gente no le interesa ver todo. En Redes sociales quedaron 4 videos (CeraVe, Vichy, Muydinnette y Gaia), marcados con `featured: true`; `ProjectCard` pasó de "una tarjeta por marca" a "una tarjeta por video". En Diseño, como mucho 2 trabajos por categoría y más chicos. En Programación, 3 sitios en cuadrados con su captura, y el widget de GitHub abajo como "Más proyectos".
+- **Portadas de los videos:** solo Vichy tenía portada y los otros se veían como cajas vacías. Saqué una captura del primer cuadro desde el reproductor oficial de cada uno y las guardé en `public/videos/`.
+- **Escondí la barra del toggle** porque ya había tres formas de elegir área (pastillas del hero, "Ver mis…" y rieles). No la borré: sus radios son los que guardan la vista.
+- **Lentes: cada área cambia la mirada de toda la página.** Con el mismo `data-view` y solo CSS:
+  - **Redes sociales:** fondo más vivo y un aro de color en cada video, como las historias.
+  - **Diseño:** una grilla de 12 columnas de fondo y un marco de selección tipo Figma al pasar el mouse.
+  - **Programación:** fondo de puntos, títulos en tipografía mono y bordes punteados, como un plano técnico.
+
+  El cambio se anima solo porque `ViewToggle` ya usaba la View Transitions API.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

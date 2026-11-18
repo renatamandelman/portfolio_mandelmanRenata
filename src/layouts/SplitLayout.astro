@@ -42,16 +42,15 @@ const views = areas;
     <!-- HERO: la presentación, arriba de todo -->
     <slot name="hero" />
 
-    <!-- TOGGLE + pista. display: contents (ver CSS): sus hijos se comportan como hijos
-         directos de <main>, así el toggle sticky acompaña el scroll por todas las columnas -->
+    <!-- TOGGLE. display: contents (ver CSS): sus hijos se comportan como hijos directos de <main>.
+         La barra está escondida a la vista (se navega con el hero, los botones "Ver mis…" y los rieles),
+         pero sus radios siguen guardando la vista y aparece si se llega con el teclado -->
     <div class="identity">
       <!-- Toggle: queda "pegado" arriba al scrollear para cambiar de vista en cualquier momento -->
       <div class="toggle-dock">
         <ViewToggle />
       </div>
 
-      <!-- Pista: solo se ve en la portada (la muestra el CSS según data-view) -->
-      <p class="view-hint px-6 text-center text-xs text-muted">Tocá una opción para ver mis trabajos</p>
     </div>
 
     <!-- SPLIT: tres paneles. Cada uno tiene un riel (se ve cuando el panel está colapsado)
@@ -128,17 +127,23 @@ const views = areas;
   /* Al saltar a #trabajos, que el toggle fijo no tape el principio de las columnas */
   .split { scroll-margin-top: 5rem; }
 
-  /* ---------- Toggle fijo ---------- */
+  /* ---------- Toggle escondido ----------
+     height: 0 → no ocupa lugar. opacity: 0 + pointer-events: none → no se ve ni se puede tocar.
+     Los radios siguen en la página: guardan la vista y los "clickean" los botones data-go.
+     :focus-within → si alguien llega con Tab, aparece flotando arriba (nunca hay un foco invisible) */
   .toggle-dock {
     position: sticky;
     top: 0.75rem;
     z-index: 30;
     display: flex;
     justify-content: center;
-    padding: 1.5rem 0;
-    pointer-events: none; /* el contenedor no bloquea clics… */
+    height: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
   }
-  .toggle-dock > :global(*) { pointer-events: auto; } /* …pero el toggle sí */
+  .toggle-dock:focus-within { opacity: 1; }
+  .toggle-dock:focus-within > :global(*) { pointer-events: auto; }
 
   /* ---------- MOBILE FIRST: un panel a la vez ---------- */
   .split {
@@ -168,10 +173,6 @@ const views = areas;
   :global(html[data-view='all']) .divider {
     display: block;
   }
-
-  /* Pista: solo en la vista inicial */
-  .view-hint { display: none; margin-top: -1rem; padding-bottom: 1.25rem; }
-  :global(html[data-view='all']) .view-hint { display: block; }
 
   /* Botones "Ver …" al final de cada panel */
   .pane-next {
