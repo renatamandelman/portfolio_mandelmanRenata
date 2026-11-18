@@ -12,6 +12,7 @@
  *   - "code"    → columna derecha: Desarrollo Web
  *   - "about"   → "Sobre mí", debajo de las columnas (en todas las vistas)
  *   - "experience" → mi CV, debajo de "Sobre mí" (en todas las vistas)
+ *   - "contact" → mail, WhatsApp y redes, al final (en todas las vistas)
  *   - "footer"  → copyright y redes
  *
  * Vistas (en <html data-view>):
@@ -35,6 +36,7 @@ interface Props {
 const navLinks = [
   { href: '#sobre-mi', label: 'Sobre mí' },
   { href: '#experiencia', label: 'Experiencia' },
+  { href: '#contacto', label: 'Contacto' },
 ];
 
 // Las tres vistas, en el mismo orden que el toggle.
@@ -139,6 +141,11 @@ const views = [
          id="experiencia" es el destino del link "Experiencia" del header -->
     <section id="experiencia" class="border-t border-line px-6 py-12 md:px-10 md:py-16" aria-labelledby="experiencia-title">
       <slot name="experience" />
+    </section>
+
+    <!-- CONTACTO: al final, en todas las vistas. Destino del link "Contacto" del header -->
+    <section id="contacto" class="border-t border-line px-6 py-12 md:px-10 md:py-16" aria-labelledby="contacto-title">
+      <slot name="contact" />
     </section>
   </main>
 

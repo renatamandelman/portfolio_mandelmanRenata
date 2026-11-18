@@ -243,6 +243,7 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - Sumé reels y placas de **Mentes Brillantes** y **Gaia** a sus modales. Del código de Instagram solo uso el id de cada publicación: mi componente arma el reproductor y lo carga recién al abrir el modal (si pegaba el script de Instagram, cargaba apenas entrabas a la página).
 - Cargué mi engagement real (11,55%) en la tarjeta de la portada, en vez del valor de ejemplo.
 - Saqué el "N videos" de las tarjetas de cada empresa.
+- Agregué la sección **Contacto** al final, con link en el header: un botón para escribirme por mail (`mailto:`), otro para WhatsApp (`wa.me`, con un mensaje ya escrito) y mis redes. El footer quedó solo con el copyright para no repetir las redes. Los datos están en `contact`, en `profile.ts`, y si el número de WhatsApp está vacío, el botón no se muestra.
 
 **Decisiones**
 - **Saqué el link "Proyectos" del header.** Apuntaba a los proyectos de Code, que en la portada están ocultos, así que no hacía nada. La forma de llegar a los proyectos es el toggle.

@@ -49,7 +49,19 @@ export const profile = {
   ],
 };
 
-/** Redes del footer: agregar o sacar una red es solo editar esta lista. */
+/**
+ * Contacto: lo usa la sección "Contacto" del final.
+ * whatsapp: número en formato internacional, solo dígitos (ej: Argentina celular → 549 + área + número).
+ * Si está vacío, el botón de WhatsApp no se muestra.
+ */
+export const contact = {
+  email: 'renatamandel@gmail.com',
+  whatsapp: '5491153369986',
+  // Mensaje que aparece ya escrito al abrir el chat
+  whatsappMessage: '¡Hola Renata! Vi tu portfolio y quería contactarte.',
+};
+
+/** Redes de la sección "Contacto": agregar o sacar una red es solo editar esta lista. */
 export const socials = [
   { label: 'GitHub', href: `https://github.com/${profile.github}` },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/renata-mandelman' },
