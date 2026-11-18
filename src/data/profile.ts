@@ -272,3 +272,31 @@ export const stack = {
   code: ['HTML5', 'CSS3', 'JavaScript', 'React', 'Astro', 'Tailwind', 'Node.js', 'Express', 'Git'],
   content: ['Figma', 'Adobe CC', 'After Effects', 'CapCut', 'Canva'],
 };
+
+/**
+ * Herramientas del dock del hero (todas salen de mi stack y mis experiencias).
+ * short: las letras del "ícono". No uso logos de las marcas: son tiles con mis colores.
+ */
+export const tools = [
+  { name: 'Figma', short: 'Fi' },
+  { name: 'Adobe CC', short: 'Cc' },
+  { name: 'After Effects', short: 'Ae' },
+  { name: 'Premiere Pro', short: 'Pr' },
+  { name: 'CapCut', short: 'Cu' },
+  { name: 'Canva', short: 'Ca' },
+  { name: 'Astro', short: 'As' },
+  { name: 'React', short: 'Re' },
+  { name: 'JavaScript', short: 'JS' },
+  { name: 'Node.js', short: 'No' },
+];
+
+/**
+ * Las tres áreas del portfolio, en el mismo orden que el toggle.
+ * id: el valor interno de <html data-view>. label: lo que lee la gente. cta: botón de la portada.
+ * Las usan SplitLayout (rieles y botones) y el Hero (tarjeta "¿Qué querés ver?").
+ */
+export const areas = [
+  { id: 'content', label: 'Redes sociales', cta: 'Ver mis videos' },
+  { id: 'design', label: 'Diseño', cta: 'Ver mis diseños' },
+  { id: 'code', label: 'Programación', cta: 'Ver mis páginas web' },
+];

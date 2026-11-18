@@ -12,6 +12,7 @@
  * En el panel Code, <DynamicApiWidget /> muestra los proyectos web (profile.ts + API de GitHub) en una sola lista.
  */
 import SplitLayout from '../layouts/SplitLayout.astro';
+import Hero from '../components/Hero.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import DynamicApiWidget from '../components/DynamicApiWidget.astro';
 import { embedUrl } from '../utils/embed';
@@ -24,6 +25,8 @@ import {
   projects,
   designWork,
   designCategories,
+  tools,
+  areas,
 } from '../data/profile';
 
 const contentWork = experiences.filter((e) => e.side === 'content');
@@ -38,25 +41,27 @@ const featuredSite = projects.find((project) => project.featured);
 
 // Video del celular: se busca por id entre los videos de todas las experiencias
 const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src === profile.heroVideo);
+
+// Abanico del hero: un trabajo de cada área (la del medio va adelante)
+const heroPreviews = [
+  { src: designPreview[0]?.image ?? '', alt: designPreview[0]?.title ?? '' },
+  { src: featuredSite?.image ?? '', alt: `Sitio web de ${featuredSite?.title}` },
+  { src: heroVideo?.poster ?? '', alt: `Video para ${heroVideo?.brand}` },
+].filter((preview) => preview.src); // si falta alguna imagen, no se dibuja
 ---
 
 <SplitLayout>
   <!-- ============ HERO ============ -->
-  <!-- Nombre + rol + frase. En la portada (desktop) SplitLayout lo hace flotar arriba al centro -->
-  <Fragment slot="hero">
-    <h1
-      class="font-display text-5xl leading-[0.95] font-extrabold tracking-tight md:text-6xl xl:text-[4.25rem]"
-    >
-      <!-- El nombre es el link para volver al inicio (portada). data-home: el script de SplitLayout
-           borra la vista guardada antes de navegar. En mobile va en dos líneas; desde md, en una -->
-      <a href="/" data-home class="transition-colors hover:text-accent-ink">Renata <br class="md:hidden" />Mandelman</a>
-    </h1>
-    <p class="eyebrow mt-3 text-ink">{profile.role}</p>
-    <!-- max-w: la frase se corta en dos renglones en vez de estirar el bloque del nombre -->
-    <p class="mx-auto mt-3 max-w-sm text-base leading-snug text-muted md:max-w-md md:text-lg">
-      {profile.tagline}
-    </p>
-  </Fragment>
+  <!-- Presentación: todo sale de profile.ts. En el centro, 3 trabajos reales (uno por área) -->
+  <Hero
+    slot="hero"
+    name={profile.name}
+    role={profile.role}
+    tagline={profile.tagline}
+    areas={areas}
+    previews={heroPreviews}
+    tools={tools}
+  />
 
   <!-- ============ PANEL CONTENT ============ -->
   <Fragment slot="content">

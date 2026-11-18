@@ -38,6 +38,8 @@ npm run preview    # sirve /dist localmente para probar el build
 
 **`ViewToggle.astro`**: es el botón `[ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]` y el foco del sitio. Cuando elegís una opción, guarda cuál es en `<html data-view>` y el CSS cambia la pantalla según eso. Lo hice con radios en vez de botones porque así ya funciona con teclado y con lectores de pantalla sin que yo tenga que programarlo. También se acuerda de la última vista que elegiste (con `localStorage`). Cuando entrás por primera vez no hay ninguna opción marcada y ves la portada con las tres columnas.
 
+**`Hero.astro`**: es la presentación de arriba de todo. Muestra "PORTFOLIO" gigante, mi nombre, un abanico con tres trabajos reales (uno de cada área), una tarjeta con lo que hago y otra con las tres áreas como botones, y abajo un dock con mis herramientas. Recibe todo por props desde `profile.ts` y no guarda estado: los botones de las áreas usan `data-go`, el mismo mecanismo que los rieles, que "clickea" el radio del toggle. Lo separé en un componente porque tiene una responsabilidad clara (presentarme) y mucho CSS propio.
+
 **`ProjectCard.astro`**: es la tarjeta de cada marca con la que trabajé como creadora de contenido. Al tocarla se abre un modal con lo que hice y los videos. Usé `<dialog>` porque ya trae el cierre con Esc y el manejo del foco. Los videos de TikTok se cargan recién cuando tocás play, para que la página no tarde más de lo necesario.
 
 **`DynamicApiWidget.astro`**: trae mis proyectos de programación desde la API de GitHub. Muestra solo los repos que tienen el topic `portfolio`, así para sumar un proyecto nuevo no tengo que tocar el código. Mientras carga muestra un aviso, y si la API falla se siguen viendo los proyectos que tengo cargados a mano, con un botón para reintentar.
@@ -117,6 +119,7 @@ Cosas que sé que todavía se pueden mejorar:
 - **Proyectos de diseño:** son míos; las versiones completas están en mi Behance.
 - **Datos de proyectos web:** API pública de GitHub.
 - **Maqueta de referencia de la portada:** hecha con Google Stitch (no usé su código).
+- **Referencia visual del hero:** `referencias/image.png`, un portfolio de otra diseñadora que usé como inspiración de composición. No usé su foto, sus textos ni sus íconos.
 - Uso de IA: ver [Bitácora → Uso de IA](#uso-de-ia).
 
 ---
@@ -271,6 +274,9 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - **Saqué las tarjetas de números de Redes sociales** (marcas, videos, interacción): eran más "datos de CV" que trabajo. Ahora esa columna muestra solo mi reel.
 - **Tipografía nueva para mi nombre y los títulos: Bricolage Grotesque.** Inter en mayúsculas se veía seca. Bricolage es más amable y tiene más personalidad, y la escribo en minúsculas para que se sienta más cercana. La sumé como token (`--font-display` en `global.css`), así Tailwind genera la clase `font-display` y cambiarla es tocar una sola línea.
 - **Saqué la barra de navegación de arriba.** Tenía solo dos links (Sobre mí y Contacto) y competía con el toggle, que es la navegación real del sitio. El nombre chico de la barra era la forma de volver a la portada, así que pasé esa función a mi nombre grande: es un link a "/" con el mismo `data-home` de antes. Debajo del nombre sumé "Diseñadora multimedial".
+- **Hero nuevo inspirado en una referencia** (`referencias/image.png`, un portfolio con estética de estudio fotográfico). Tomé la composición: la palabra "PORTFOLIO" gigante, el nombre fino con el año, tarjetas tipo vidrio a los costados y un dock de herramientas abajo. La adapté a mi portfolio: sin foto mía (en el centro va un abanico con tres trabajos reales), con mis colores y con las tres áreas como botones en la tarjeta de la derecha. Los íconos del dock son tiles con iniciales y mis colores, no los logos de las marcas.
+- Con el hero como sección propia arriba, saqué el CSS que hacía flotar el nombre encima de las columnas: `SplitLayout` quedó más simple.
+- La lista de áreas (id, texto y botón) pasó a `profile.ts` (`areas`), así el hero y `SplitLayout` usan la misma y no hay que cambiarla en dos lugares.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

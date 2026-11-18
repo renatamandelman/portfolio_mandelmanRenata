@@ -6,7 +6,7 @@
  * y reaccionar al modo elegido en ViewToggle mediante <html data-view>.
  *
  * Slots:
- *   - "hero"    → nombre + bajada (arriba, centrado, en todas las vistas)
+ *   - "hero"    → presentación (<Hero />), arriba de todo, en todas las vistas
  *   - "content" → columna izquierda: Creación de Contenido / RRSS
  *   - "design"  → columna del medio: Diseño gráfico / UX-UI
  *   - "code"    → columna derecha: Desarrollo Web
@@ -16,9 +16,8 @@
  *
  * Vistas (en <html data-view>):
  *   all (inicio)            → portada: cada columna muestra solo su "imagen", sin listas de proyectos.
- *                             Desktop: una pantalla, con el nombre + toggle flotando arriba al centro.
- *                             Mobile: columnas apiladas.
- *                             No hay opción marcada en el toggle; se vuelve tocando el nombre del header.
+ *                             Desktop: tres columnas iguales. Mobile: columnas apiladas.
+ *                             No hay opción marcada en el toggle; se vuelve tocando mi nombre en el hero.
  *   content / design / code → las escribe ViewToggle.
  *                             Se ven la imagen y los proyectos de esa área (.more).
  *                             Desktop: ese panel grande y los otros dos como rieles.
@@ -26,48 +25,39 @@
  */
 import BaseLayout from './BaseLayout.astro';
 import ViewToggle from '../components/ViewToggle.astro';
+import { areas } from '../data/profile';
 
 interface Props {
   title?: string;
   description?: string;
 }
 
-// Las tres vistas, en el mismo orden que el toggle.
-// Se usan para armar los rieles y los botones "Ver …" de cada panel.
-const views = [
-  // cta: el botón de la portada que abre esa área
-  { id: 'content', label: 'Redes sociales', cta: 'Ver mis videos' },
-  { id: 'design', label: 'Diseño', cta: 'Ver mis diseños' },
-  { id: 'code', label: 'Programación', cta: 'Ver mis páginas web' },
-];
+// Las tres vistas (profile.ts): arman los rieles y los botones "Ver …" de cada panel
+const views = areas;
 ---
 
 <BaseLayout {...Astro.props}>
 
-  <!-- relative: referencia para ubicar el nombre flotante de la portada -->
-  <main id="main" class="relative mx-auto max-w-[1440px]">
-    <!-- IDENTIDAD: nombre + toggle.
-         Desktop en la portada → flota arriba al centro, encima de las columnas.
-         Resto de los casos → display: contents (como si el div no existiera) y queda arriba. -->
-    <div class="identity">
-      <!-- HERO -->
-      <section class="hero px-6 pt-10 pb-6 text-center md:px-10 md:pt-12" aria-label="Presentación">
-        <slot name="hero" />
-      </section>
+  <main id="main" class="mx-auto max-w-[1440px]">
+    <!-- HERO: la presentación, arriba de todo -->
+    <slot name="hero" />
 
+    <!-- TOGGLE + pista. display: contents (ver CSS): sus hijos se comportan como hijos
+         directos de <main>, así el toggle sticky acompaña el scroll por todas las columnas -->
+    <div class="identity">
       <!-- Toggle: queda "pegado" arriba al scrollear para cambiar de vista en cualquier momento -->
       <div class="toggle-dock">
         <ViewToggle />
       </div>
 
-      <!-- Pista: solo se ve en la portada (la muestra el CSS según data-view).
-           Está dentro de .identity para que en desktop flote junto al nombre y el toggle -->
+      <!-- Pista: solo se ve en la portada (la muestra el CSS según data-view) -->
       <p class="view-hint px-6 text-center text-xs text-muted">Tocá una opción para ver mis trabajos</p>
     </div>
 
     <!-- SPLIT: tres paneles. Cada uno tiene un riel (se ve cuando el panel está colapsado)
          y, al final, botones para ir a las otras vistas (solo mobile) -->
-    <div class="split">
+    <!-- id="trabajos": destino del botón "Conocé mi trabajo" del hero -->
+    <div class="split" id="trabajos">
       {
         views.map((view, i) => (
           <>
@@ -135,6 +125,9 @@ const views = [
      acompaña el scroll en las vistas de cada área. */
   .identity { display: contents; }
 
+  /* Al saltar a #trabajos, que el toggle fijo no tape el principio de las columnas */
+  .split { scroll-margin-top: 5rem; }
+
   /* ---------- Toggle fijo ---------- */
   .toggle-dock {
     position: sticky;
@@ -142,7 +135,7 @@ const views = [
     z-index: 30;
     display: flex;
     justify-content: center;
-    padding-bottom: 1.5rem;
+    padding: 1.5rem 0;
     pointer-events: none; /* el contenedor no bloquea clics… */
   }
   .toggle-dock > :global(*) { pointer-events: auto; } /* …pero el toggle sí */
@@ -177,7 +170,7 @@ const views = [
   }
 
   /* Pista: solo en la vista inicial */
-  .view-hint { display: none; margin-top: -0.75rem; padding-bottom: 1.25rem; }
+  .view-hint { display: none; margin-top: -1rem; padding-bottom: 1.25rem; }
   :global(html[data-view='all']) .view-hint { display: block; }
 
   /* Botones "Ver …" al final de cada panel */
@@ -242,42 +235,15 @@ const views = [
     .divider { height: auto; }
     .pane-next { display: none; }
 
-    /* La pista flota debajo del toggle (en la portada el toggle no tiene espacio abajo) */
-    .view-hint { margin-top: 0.75rem; padding-bottom: 0; }
-
     .pane-body { padding: 2.5rem clamp(1.25rem, 2.5vw, 2.5rem); }
 
-    /* --- Portada: una pantalla con el nombre flotando arriba al centro --- */
-    :global(html[data-view='all']) .identity {
-      position: absolute;
-      top: 0;
-      left: 50%;
-      translate: -50% 0;
-      z-index: 40;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: max-content;
-      /* Fondo crema: tapa las líneas entre columnas para que no corten el nombre */
-      padding: 0 2.5rem 1rem;
-      background: var(--color-cream);
-    }
-    /* El toggle viaja con el nombre (no sticky) */
-    :global(html[data-view='all']) .toggle-dock { position: static; padding-bottom: 0; }
-
-    /* Las columnas ocupan la pantalla (menos el header) y las líneas suben detrás del nombre */
-    :global(html[data-view='all']) .split {
-      min-height: 100dvh;
-      border-top: 0;
-    }
-    /* Cada columna: título arriba (debajo del nombre) y la imagen debajo */
+    /* --- Portada: cada columna es título arriba, imagen y botón abajo --- */
     :global(html[data-view='all']) .pane { display: flex; flex-direction: column; }
     :global(html[data-view='all']) .pane-body {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      padding-top: 19.5rem; /* lugar para el nombre, el rol, la frase, el toggle y la pista que flotan arriba */
     }
 
     /* Vista inicial: las tres columnas iguales (los valores por defecto de arriba).
@@ -331,9 +297,9 @@ const views = [
   document.querySelectorAll<HTMLButtonElement>('[data-go]').forEach((button) => {
     button.addEventListener('click', () => {
       document.querySelector<HTMLInputElement>(`[data-view-toggle] input[value="${button.dataset.go}"]`)?.click();
-      // Los botones dentro de un panel (no los rieles) pueden estar abajo de todo:
-      // volvemos arriba para ver el panel nuevo desde el principio
-      if (button.closest('.pane-body')) document.getElementById('main')?.scrollIntoView();
+      // Los botones del hero y los de abajo de cada panel (no los rieles):
+      // llevamos la pantalla al principio de las columnas para ver el área elegida
+      if (button.closest('.pane-body, [data-hero]')) document.getElementById('trabajos')?.scrollIntoView();
     });
   });
 
