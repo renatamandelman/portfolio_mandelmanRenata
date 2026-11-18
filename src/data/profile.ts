@@ -250,10 +250,7 @@ export const experiences: Experience[] = [
       { brand: 'Vichy', title: 'Protector solar', platform: 'tiktok', src: '7612772716013243656', poster: '/videos/vichy-protector-solar.jpg', featured: true }, // ← video del hero (el poster es la portada del celular)
       { brand: 'CeraVe', title: 'Limpiador + Loción Humectante', platform: 'tiktok', src: '7611574593475693842', poster: '/videos/cerave-limpiador.jpg', featured: true },
       { brand: 'Maybelline', title: 'Tattoo Liner 48H', platform: 'tiktok', src: '7530338466295516434' },
-      { brand: 'Hogar & Deco', title: 'Antes y después con almohadones', platform: 'local', src: '/videos/hogar-antes-y-despues.mp4', poster: '/videos/hogar-antes-y-despues.jpg' },
-      { brand: 'Hogar & Deco', title: 'Cubresillas', platform: 'local', src: '/videos/hogar-cubresillas.mp4', poster: '/videos/hogar-cubresillas.jpg' },
-      { brand: 'Hogar & Deco', title: 'Tu almohadón según tu personalidad', platform: 'local', src: '/videos/hogar-almohadon-personalidad.mp4', poster: '/videos/hogar-almohadon-personalidad.jpg' },
-      { brand: 'Hogar & Deco', title: 'Errores al decorar con almohadones', platform: 'local', src: '/videos/hogar-errores-almohadones.mp4', poster: '/videos/hogar-errores-almohadones.jpg' },
+      { brand: 'Hogar & Deco', title: 'Antes y después con almohadones', platform: 'local', src: '/videos/hogar-antes-y-despues.mp4', poster: '/videos/hogar-antes-y-despues.jpg', featured: true },
     ],
   },
   {

@@ -132,7 +132,7 @@ const heroPreviews = [
         <!-- PROYECTOS (vista Redes sociales): los videos que elegí; cada uno abre su modal.
              @container: la grilla se acomoda al ancho del PANEL, no al de la pantalla -->
         <div class="more @container my-8">
-          <ul class="grid grid-cols-2 gap-4 @2xl:grid-cols-4">
+          <ul class="grid grid-cols-2 gap-4 @2xl:grid-cols-3 @4xl:grid-cols-5">
             {featuredVideos.map(({ video, job }) => <ProjectCard video={video} job={job} />)}
           </ul>
         </div>
