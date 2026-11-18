@@ -60,10 +60,6 @@ Además, los layouts tienen su propia lógica: `SplitLayout.astro` arma las tres
 
 **No usé React ni otro framework.** Las interacciones son simples y con TypeScript dentro de los `<script>` de Astro alcanzaba. Sumar un framework hubiera sido más código para explicar sin que la experiencia mejore.
 
-Otras decisiones importantes:
-- **Una sola fuente de verdad para la vista:** la vista elegida vive solo en `<html data-view>`. El toggle la escribe y el CSS la lee. Así no hay dos cosas que se puedan desincronizar.
-- **Los datos separados del diseño:** mi experiencia, las marcas, los proyectos y los textos están en `src/data/profile.ts`. Los componentes reciben esos datos y los muestran, así para sumar algo no toco el HTML.
-- **Elementos nativos primero:** radios para el toggle, `<dialog>` para los modales y `<button>` para todo lo que se toca. Ya vienen accesibles y me ahorran código.
 - **Deploy en Vercel:** como el sitio es estático, Vercel detecta Astro solo y no tuve que configurar nada.
 
 ## API / fuente dinámica
@@ -95,11 +91,11 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 ## Responsive y accesibilidad
 
 **Responsive.** No quise que en el celular el sitio fuera la versión de escritorio achicada, así que cambia la forma de recorrerlo:
-- **Desktop (desde 1024px, una notebook chica):** el hero muestra las tarjetas a los costados del abanico, que se achican con `clamp()` para no pisarse en pantallas chicas. Las tres columnas se ven una al lado de la otra y cada una se alinea según su lugar (izquierda, centro, derecha). Al elegir un área, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
-- **Tablet (640 a 1023px):** en el hero el abanico va primero y las dos tarjetas quedan lado a lado debajo. Las columnas se apilan, todas alineadas a la izquierda, que se lee mejor.
+- **Desktop:** el hero muestra las tarjetas a los costados del abanico, que se achican con `clamp()` para no pisarse en pantallas chicas. Las tres columnas se ven una al lado de la otra y cada una se alinea según su lugar (izquierda, centro, derecha). Al elegir un área, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
+- **Tablet:** en el hero el abanico va primero y las dos tarjetas quedan lado a lado debajo. Las columnas se apilan, todas alineadas a la izquierda, que se lee mejor.
 - **Mobile:** en el hero, primero el abanico (lo visual) y después las tarjetas, una debajo de la otra; el dock se scrollea de costado. Al elegir un área se ve solo ese panel, con "← Ver las tres áreas" arriba y, al final, botones para ir a las otras áreas sin volver arriba.
 - Para las grillas de trabajos usé **container queries** (`@container`): la cantidad de columnas depende del ancho del panel, que cambia según el área elegida, y no del ancho de la pantalla.
-- Revisé la portada y las tres áreas a 390, 768, 1024 y 1440 px.
+
 
 **Accesibilidad.**
 - **Elementos nativos:** el toggle son radios, los modales son `<dialog>` y todo lo que se toca es un `<button>` o un link. Así funciona con teclado (Tab, flechas, Esc) sin programarlo aparte.
@@ -134,20 +130,19 @@ Cosas que sé que todavía se pueden mejorar:
 
 ## Bitácora
 
-> Mi registro de cómo fui armando el portfolio: qué hice, por qué, qué probé y descarté, y qué me quedó pendiente.
-> Lo voy escribiendo al terminar cada jornada.
-> Cada día cuenta cómo era el sitio en ese momento, así se ve cómo fue cambiando (por ejemplo, el toggle `[ CONTENT ⇄ CODE ]` del principio). Cómo es el sitio hoy está en las secciones de arriba.
+> Acá fui anotando cómo armé el portfolio: qué hice, por qué, qué probé y descarté y qué me quedó pendiente.
+> Lo escribía al terminar cada día, así que cada día cuenta cómo era el sitio en ese momento (cómo quedó al final está más arriba en este README).
 
 ### El problema que quiero resolver
 
-Mi perfil tiene tres partes que en un CV quedan desconectadas: **creación de contenido / RRSS** , **Diseño** y **desarrollo web** .
-La idea de "Split View" es que esa mezcla sea la *forma* del sitio y no solo un dato: la persona que entra elige desde qué lado leerme.
+Hago tres cosas distintas: contenido para redes, diseño y páginas web. En un CV eso queda como tres cosas sueltas.
+Con "Split View" quería que esa mezcla se viera en el sitio mismo, y que cada persona eligiera desde qué lado mirarme.
 
 ### Alternativas que pensé al principio
 
-- **Portfolio de scroll único con secciones:** funciona, pero no muestra que mis áreas se mezclan; parece un CV largo.
-- **Una página por área (/content, /design, /code):** rompe la idea de ver todo junto.
-- **Pantalla dividida + toggle de modo de lectura** ✅ (la que elegí): la interacción principal cambia cómo se lee todo el sitio.
+- Una sola página larga con secciones. Funcionaba, pero parecía un CV largo y no se veía que mis áreas se mezclan.
+- Una página por área (/content, /design, /code). La descarté porque se perdía lo de ver todo junto.
+- Pantalla dividida con un toggle para elegir qué mirar ✅. Es la que elegí, porque tocar el toggle cambia cómo se ve todo el sitio. Ademas me servia para pensar en la animación que iba a llevar.
 
 ---
 
@@ -155,191 +150,122 @@ La idea de "Split View" es que esa mezcla sea la *forma* del sitio y no solo un 
 
 **De dónde arranqué**
 
-Mi primer diseño tenía dos columnas, **Content | Code**, con mi nombre grande en el centro y un toggle de dos opciones. Todavía no existía la columna de Design (la sumé en los días 2 y 3).
+Mi primer diseño tenía dos columnas, Content y Code, con mi nombre grande en el medio y un toggle de dos opciones. La columna de Design todavía no existía, la sumé en los días 2 y 3.
 
 ![Primer diseño: dos columnas, Creación de contenido a la izquierda y Desarrollo web a la derecha, con mi nombre grande en el centro y el toggle Content / Code debajo](referencias/hero.png)
 
 **Qué hice**
-- Armé el proyecto con Astro 7 + Tailwind v4 (como plugin de Vite) y fuentes autoalojadas (Inter y JetBrains Mono).
-- Definí los colores y tipografías como tokens en `src/styles/global.css` con `@theme`.
-- Hice `BaseLayout`, `SplitLayout` y mi primer componente: `ViewToggle`.
-- Separé los datos del CV en `src/data/profile.ts`.
+- Creé el proyecto con Astro 7 y Tailwind v4. Las fuentes (Inter y JetBrains Mono) están guardadas en el proyecto.
+- Puse los colores y las tipografías como tokens en `src/styles/global.css`, con `@theme`.
+- Hice `BaseLayout`, `SplitLayout` y mi primer componente, `ViewToggle`.
+- Pasé los datos del CV a `src/data/profile.ts` para no tenerlos mezclados con el HTML.
 
 **Decisiones**
-- La vista elegida se guarda en `<html data-view>`: es la única "fuente de verdad". El toggle la escribe y el CSS la lee.
-- Usé **radios nativos** para el toggle en vez de botones con JS, porque ya son accesibles (Tab + flechas, y los lectores de pantalla los anuncian).
-- En desktop, el panel que no está elegido no desaparece: queda como un **riel** vertical que se puede clickear.
-
-**Problemas**
-- A 390px el menú del header se partía en dos líneas y aparecía scroll horizontal. Lo resolví poniendo el header en columna en mobile y `whitespace-nowrap`.
+- La vista que elegís queda guardada en un solo lugar, el atributo `data-view` de `<html>`. El toggle lo cambia y el CSS lo lee.
+- Para el toggle usé inputs de tipo radio y no botones con JS. Los radios ya funcionan con el teclado (Tab y flechas) y los lectores de pantalla los leen bien, así que eso no lo tuve que programar.
+- En compu, la columna que no está elegida no desaparece: queda finita al costado (le digo "riel") y se puede tocar para abrirla.
 
 ---
 
 ### Días 2 y 3 — 11 y 12/11
 
 **Qué hice**
-- Hice `ProjectCard`: cada marca con la que trabajé es una tarjeta que abre un modal (`<dialog>`) con mis tareas y los videos.
-- Sumé los videos UGC (TikTok, Instagram y videos locales). El reproductor de TikTok recién se carga al tocar play, para que la página no cargue cosas de más.
-- El toggle pasó de 2 a 3 opciones: `[ CONTENT ⇄ DESIGN ⇄ CODE ]`, porque el diseño gráfico y UX/UI también es parte de lo que hago.
+- Hice `ProjectCard`. Cada marca con la que trabajé es una tarjeta, y al tocarla se abre un modal (`<dialog>`) con lo que hice y los videos.
+- Sumé los videos UGC de TikTok, de Instagram y algunos guardados en el proyecto. El reproductor de TikTok se carga recién cuando tocás play, para que la página no cargue de más.
+- El toggle pasó a tener 3 opciones, `[ CONTENT ⇄ DESIGN ⇄ CODE ]`, porque el diseño gráfico y UX/UI también es parte de lo que hago.
 
 
 ---
 
 ### Día 4 — 13/11
 
-Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar una que me cerrara.
+Este día rehice la estructura. Probé varias versiones hasta que una me cerró.
 
 **Lo que probé y descarté**
-1. **Nombre arriba y Design debajo.** Saqué mi nombre del centro y puse los proyectos de diseño abajo. Perdía fuerza: el nombre quedaba como un título más. 
-2. **Nombre flotando encima de los proyectos de Design.** Quedaba tapando las imágenes y no se entendía.
-3. Volví a la versión del principio (nombre en el centro de Content | Code, como en la captura del Día 1) mientras pensaba otra cosa. Pero ya no me servía: con Design tenía que haber tres columnas.
-4. **Tres columnas con "muestras" de proyectos.** Cada columna mostraba algunos proyectos y un botón "Ver todo". Mezclaba la portada con las listas y se veía recargado.
+1. Mi nombre arriba y los proyectos de Design abajo. El nombre quedaba como un título más y perdía fuerza.
+2. Mi nombre flotando encima de los proyectos de Design. Tapaba las imágenes y no se entendía nada.
+3. Volví a la primera versión (nombre en el medio de Content y Code, como en la captura del Día 1) mientras pensaba otra cosa. Pero con Design ya necesitaba tres columnas, así que tampoco iba.
+4. Tres columnas con algunos proyectos de muestra y un botón "Ver todo". Se mezclaba la portada con las listas y quedaba muy cargado.
 
 **Lo que quedó**
-- Me armé una maqueta en HTML con google Stitch como referencia: tres columnas iguales, **Content | Design | Code** (en el mismo orden que el toggle), con mi nombre y el toggle arriba al centro. La rehice con mis componentes y mis tokens.
-- La pantalla de inicio es una **portada visual**: cada columna es una "imagen" (el celular con el reel, un frame tipo Figma con mi proyecto destacado y la paleta real del sitio, y el editor de código).
-- Al tocar un botón, ese panel se agranda y aparecen **sus proyectos** al lado de la imagen. Los otros dos quedan como rieles.
-- En mobile se ve un panel a la vez y se cambia con el toggle, que queda fijo arriba al scrollear.
+- Armé una maqueta con Google Stitch para tener una referencia: tres columnas iguales, Content, Design y Code (en el mismo orden que el toggle), con mi nombre y el toggle arriba en el medio. Después la rehice con mis componentes y mis tokens.
+- La pantalla de inicio pasó a ser una portada con una imagen por columna: un celular con el reel, un frame tipo Figma con mi proyecto destacado y la paleta del sitio, y un editor de código.
+- Cuando tocás un área, esa columna se agranda y aparecen sus proyectos al lado de la imagen. Las otras dos quedan como rieles.
+- En el celu se ve una columna a la vez y se cambia con el toggle, que queda fijo arriba cuando scrolleás.
 
-**Cómo lo resolví en código**
-- Agregué un cuarto estado, `data-view="all"`, para la portada. Al entrar, el toggle no tiene ninguna opción marcada (con radios nativos eso es válido) y se vuelve al inicio tocando mi nombre en el header.
-- Los proyectos de cada panel tienen la clase `.more`, que solo se ve cuando ese panel está elegido. Todo depende de `data-view`, sin JS extra.
-- El proyecto destacado de diseño se marca con `featured: true` en `profile.ts`, así no queda escrito a mano en el HTML.
-- Para que la imagen y los proyectos se pongan lado a lado usé una **container query** (`@container`): el diseño depende del ancho del panel (que cambia con el toggle), no del de la pantalla.
 
 **API de GitHub**
-- Hice `DynamicApiWidget`: trae mis repos públicos de la API de GitHub y muestra los que tienen el topic `portfolio` y una URL de Vercel. Para sumar un proyecto no toco código: le pongo el topic en GitHub.
-- Al principio los mostraba en una sección aparte "desde GitHub", pero para quien visita son todos mis proyectos, así que los junté en una sola lista con los de `profile.ts`. Si la API falla, los de `profile.ts` se siguen viendo, con un aviso y un botón "Reintentar".
-- Hice `ProjectLink` para que las tarjetas fijas y las que llegan de la API usen el mismo markup (el widget la usa vacía como molde dentro de un `<template>`).
-- Marqué 3 repos con el topic: castingFlow, Keipana Academy y UGC Gaia.
+- Hice `DynamicApiWidget`. Trae mis repos públicos de GitHub y muestra los que tienen el topic `portfolio` y un link de Vercel. Si quiero sumar un proyecto no toco el código, le agrego el topic en GitHub y listo.
+- Primero los mostraba en una sección aparte que decía "desde GitHub". Después pensé que a quien entra le da igual de dónde salen, así que los junté con los de `profile.ts` en una sola lista. Si la API falla, los de `profile.ts` se siguen viendo, con un aviso y un botón para reintentar.
+- Hice `ProjectLink` para que las tarjetas fijas y las que vienen de la API tengan el mismo HTML. El widget usa una vacía, adentro de un `<template>`, como molde.
+- Le puse el topic a 3 repos: castingFlow, Keipana Academy y UGC Gaia.
 
 **Otras decisiones**
-- **Proyectos de diseño:** los datos están en `profile.ts`, las imágenes locales en `public/design/` y cada tarjeta linkea a Behance. No usé base de datos porque no le suma nada a la propuesta, y no tomo las imágenes directo de Behance porque si cambian las URLs se rompen. Behance tampoco me sirve como API porque su API pública está cerrada.
-- Moví la "Animación Gimnasio" de Content a **Design → Motion**: es una pieza de motion, no contenido para redes.
-- Agregué un **"Sobre mí"** con el texto de mi CV. Lo probé debajo de mi nombre, pero en la portada no entraba, así que quedó debajo de las columnas.
-- **Portada del reel:** quise sacar la miniatura de TikTok con su API (oEmbed), pero para este video no la devuelve, y además esas URLs vencen. Usé una captura mía guardada en `public/videos/`.
-
-**Problemas**
-- Después de poner imagen y proyectos lado a lado, **los proyectos de Design desaparecieron**. La lista tenía `@container` y `mx-auto` dentro de una grilla: `mx-auto` hace que el elemento tome el ancho de su contenido, pero un container no usa su contenido para calcular su ancho, así que quedaba en 0px. Lo arreglé con `w-full`. Aprendí que un `@container` necesita un ancho que le venga de afuera.
+- Los proyectos de diseño están en `profile.ts`, las imágenes en `public/design/` y cada tarjeta lleva a Behance. No usé una base de datos porque no hacía falta. Tampoco traigo las imágenes directo de Behance: si cambian las URLs se rompen, y su API pública está cerrada.
+- Pasé la "Animación Gimnasio" de Content a Design → Motion, porque es una pieza de motion y no contenido para redes.
+- Agregué un "Sobre mí" con el texto de mi CV. Lo quise poner debajo de mi nombre pero en la portada no entraba, así que lo dejé debajo de las columnas.
+- Para la portada del reel quise sacar la miniatura con la API de TikTok (oEmbed), pero para este video no la devuelve y además esas URLs vencen. Terminé usando una captura que guardé en `public/videos/`.
 
 **Deploy**
-- Subí el sitio a Vercel: https://portfolio-mandelman-renata.vercel.app. Como es estático, no tuve que configurar nada (Vercel detecta Astro solo). Después actualicé `site` en `astro.config.mjs` con la URL real.
-
-**Pruebas de pantalla**
-- [x] 390px: portada, Content, Design, Code
-- [ ] 1440px: portada, Content, Design, Code
-- [ ] Sitio publicado en el celular
-
-**Pendiente**
-- Los links "Proyectos" y "Experiencia" del header apuntan a partes que en la portada están ocultas. _(Experiencia: resuelto el Día 5)_
-- ~~La foto del reel pesa 462 KB y se ve chiquita: achicarla.~~ _(resuelto el Día 5: 216 KB)_
-- ~~Completar las otras secciones de este README.~~ _(resuelto el Día 5)_
-
+- Subí el sitio a Vercel: https://portfolio-mandelman-renata.vercel.app. Como es estático no tuve que configurar nada, Vercel reconoce Astro solo. Después cambié `site` en `astro.config.mjs` por la URL real.
 ---
 
 ### Día 5 — 18/11
 
 **Qué hice**
-- Completé partes del README: a quién está dirigido el portfolio, los componentes propios y las tecnologías y decisiones.
-- Ordené la bitácora: sumé la captura de mi primer diseño (dos columnas) en el Día 1 para que se vea de dónde arranqué.
-- Agregué la sección **Experiencia** debajo de "Sobre mí", con mi CV separado en dos columnas: **Actual** y **Terminado**. Sale de `experiences` en `profile.ts`: si el período dice "Presente", va en Actual.
-- Sumé mi **foto en "Sobre mí"**, recortada en círculo y con el texto centrado al lado.
-- Saqué las etiquetas del final de cada columna ("Creative Lab", "Diseño UI/UX", "Desarrollo"): repetían lo que ya dice el título de arriba.
-- Cambié el título de la pestaña a "Renata Mandelman - Portfolio".
-- Cambié los subtítulos de las columnas para que las tres tengan el mismo formato: "Edición · Reels · UGC · Community" en Content (antes decía "Diseño multimedial, desarrollo y RRSS", que eran cosas de las otras columnas) y "Frontend · Astro · React · APIs" en Code.
-- **Hice que el toggle se entienda en la portada.** Al entrar no hay ninguna opción marcada y parecía un subtítulo, no algo para tocar. Ahora, solo en la portada:
-  - cada opción tiene fondo rosado, como un botón, y se pinta al pasar el mouse;
-  - al cargar, las tres se iluminan una tras otra (Content → Design → Code) dos veces y se quedan quietas;
-  - debajo aparece la pista "Elegí Content, Design o Code para ver cada área", que antes solo se veía en mobile.
-- Completé los créditos del README y el período de mi trabajo freelance (2025 — Presente).
-- Sumé reels y placas de **Mentes Brillantes** y **Gaia** a sus modales. Del código de Instagram solo uso el id de cada publicación: mi componente arma el reproductor y lo carga recién al abrir el modal (si pegaba el script de Instagram, cargaba apenas entrabas a la página).
-- Cargué mi engagement real (11,55%) en la tarjeta de la portada, en vez del valor de ejemplo.
-- Saqué el "N videos" de las tarjetas de cada empresa.
-- Agregué la sección **Contacto** al final, con link en el header: un botón para escribirme por mail (`mailto:`), otro para WhatsApp (`wa.me`, con un mensaje ya escrito) y mis redes. El footer quedó solo con el copyright para no repetir las redes. Los datos están en `contact`, en `profile.ts`, y si el número de WhatsApp está vacío, el botón no se muestra.
+- Escribí más partes del README y sumé al Día 1 la captura de mi primer diseño.
+- Agregué una sección Experiencia debajo de "Sobre mí" (Actual y Terminado, sale de `experiences` en `profile.ts`) y puse mi foto en círculo.
+- Emparejé los subtítulos de las columnas y saqué las etiquetas de abajo, que repetían el título.
+- Hice que el toggle se entienda en la portada. Como al entrar no hay nada marcado, parecía un subtítulo. Ahora, solo en la portada, cada opción tiene fondo como un botón y al cargar se iluminan una después de la otra, dos veces. Es solo CSS (`@keyframes` con un `animation-delay` distinto en cada una) y depende de `data-view="all"`. Si tenés "reducir movimiento", no se anima.
+- Sumé reels. De Instagram solo uso el id de la publicación y mi componente arma el reproductor cuando abrís el modal. Si pegaba su script, se cargaba apenas entrabas a la página.
+- Agregué Contacto al final, con un botón de mail (`mailto:`) y otro de WhatsApp (`wa.me`, con un mensaje ya escrito). Los datos están en `contact` en `profile.ts`.
 
 **Decisiones**
-- **Saqué el link "Proyectos" del header.** Apuntaba a los proyectos de Code, que en la portada están ocultos, así que no hacía nada. La forma de llegar a los proyectos es el toggle.
-- **Los números de la portada se calculan solos.** Antes eran valores de ejemplo ("+100 reels", "+300 piezas"). Ahora salen de mis datos: cuántas marcas y videos hay en `experiences` y cuántas piezas en `designWork`. Uso un `Set` para no contar dos veces la misma marca. El "+" es porque muestro una selección: hice más trabajos de los que están en el portfolio.
-- **El link "Experiencia" del header ahora lleva a algo.** 
-- **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
-- **La animación del toggle es solo CSS** (`@keyframes` y un `animation-delay` distinto por opción) y depende de `data-view="all"`, así que no sumé JavaScript ni otra fuente de estado. Cuando elegís una vista desaparece sola. Si la persona tiene activado "reducir movimiento", no se anima.
-
----
-
-### Día 5 (tarde) — Testeo con usuarios y cambios
+- Saqué el link "Proyectos" del header porque llevaba a algo oculto en la portada.
+- Cambié el nombre de "Dual View" a "Split View". "Dual" era de cuando tenía dos áreas, y además ahora coincide con mi layout, `SplitLayout`.
 
 **El testeo**
-- Le mostré el portfolio publicado a _(completar: cuántas personas y quiénes, por ejemplo amigos, familia o compañeros)_ sin explicarles nada.
-- **Nadie sabía dónde tocar:** no se daban cuenta de que el toggle abría los trabajos.
-- **Parecía un CV:** lo que se leía de corrido era "Sobre mí", "Experiencia" y números, y casi no se veía trabajo.
-- Me di cuenta de que mi portfolio está pensado para marcas y emprendimientos, y muchos no saben qué es "UGC", "frontend" o "engagement". Tenía que hablar como ellos.
+- Le mostré el portfolio publicado a 3 personas sin explicarles nada.
+- Nadie sabía dónde tocar, no se daban cuenta de que el toggle abría los trabajos.
+- Parecía un CV: se leían "Sobre mí", "Experiencia" y números, y casi no se veían mis trabajos.
+- Me di cuenta de que el portfolio es para marcas y emprendimientos, y mucha gente no sabe qué es "UGC", "frontend" o "engagement". Tenía que hablar como ellos.
 
-**Qué cambié por el testeo**
-- **Textos que entienda cualquiera:** el toggle ahora dice **Redes sociales · Diseño · Programación** (antes Content · Design · Code). Debajo de mi nombre hay una frase que dice qué hago, y las columnas tienen subtítulos en lenguaje simple ("Videos para que más gente conozca tu marca").
-- **Un botón para cada área:** cada columna de la portada termina con "Ver mis videos →", "Ver mis diseños →" o "Ver mis páginas web →". Reusan los mismos `data-go` que los rieles, que "clickean" el radio del toggle, así no sumé otra fuente de estado.
-- **Trabajo real en la portada:** saqué las maquetas (el frame de Figma con la paleta y el editor con código de ejemplo). Ahora Diseño muestra un collage con 3 trabajos de Behance y Programación una captura de un sitio que hice (Mentes Brillantes), y cada uno lleva al proyecto real.
-- **Menos CV:** saqué la sección Experiencia y reescribí "Sobre mí" en primera persona y sin jerga.
-- **Refresh visual:** el bloque del nombre tapa las líneas entre columnas, los subtítulos se leen como frases y los botones van en mi salmón con texto oscuro. La portada entra en una pantalla de 1440×900.
-- **Saqué las tarjetas de números de Redes sociales** (marcas, videos, interacción): eran más "datos de CV" que trabajo. Ahora esa columna muestra solo mi reel.
-- **Tipografía nueva para mi nombre y los títulos: Bricolage Grotesque.** Inter en mayúsculas se veía seca. Bricolage es más amable y tiene más personalidad, y la escribo en minúsculas para que se sienta más cercana. La sumé como token (`--font-display` en `global.css`), así Tailwind genera la clase `font-display` y cambiarla es tocar una sola línea.
-- **Saqué la barra de navegación de arriba.** Tenía solo dos links (Sobre mí y Contacto) y competía con el toggle, que es la navegación real del sitio. El nombre chico de la barra era la forma de volver a la portada, así que pasé esa función a mi nombre grande: es un link a "/" con el mismo `data-home` de antes. Debajo del nombre sumé "Diseñadora multimedial".
-- **Hero nuevo inspirado en una referencia** (`referencias/image.png`, un portfolio con estética de estudio fotográfico). Tomé la composición: la palabra "PORTFOLIO" gigante, el nombre fino con el año, tarjetas tipo vidrio a los costados y un dock de herramientas abajo. La adapté a mi portfolio: sin foto mía (en el centro va un abanico con tres trabajos reales), con mis colores y con las tres áreas como botones en la tarjeta de la derecha. Los íconos del dock son tiles con iniciales y mis colores, no los logos de las marcas.
-- Con el hero como sección propia arriba, saqué el CSS que hacía flotar el nombre encima de las columnas: `SplitLayout` quedó más simple.
-- La lista de áreas (id, texto y botón) pasó a `profile.ts` (`areas`), así el hero y `SplitLayout` usan la misma y no hay que cambiarla en dos lugares.
-- **Paleta verde agua.** Cambié el salmón por tonos verde agua. Como los colores son tokens en `global.css`, cambiar los valores de `accent`, `accent-soft` y `accent-ink` alcanzó para cambiar todo el sitio. Antes de elegirlos medí el contraste: el verde agua va solo de fondo y para texto uso un verde petróleo.
-- **El fondo del hero ahora está en toda la página.** Lo saqué del `Hero` y lo puse en `body::before`, una capa con `position: fixed` detrás de todo: no se estira cuando la página es larga y se ve igual al scrollear. Por eso oscurecí un poco el gris de los textos secundarios.
-- **Mostrar menos, elegido por mí.** A la gente no le interesa ver todo. En Redes sociales quedaron 4 videos (CeraVe, Vichy, Muydinnette y Gaia), marcados con `featured: true`; `ProjectCard` pasó de "una tarjeta por marca" a "una tarjeta por video". En Diseño, como mucho 2 trabajos por categoría y más chicos. En Programación, 3 sitios en cuadrados con su captura, y el widget de GitHub abajo como "Más proyectos".
-- **Portadas de los videos:** solo Vichy tenía portada y los otros se veían como cajas vacías. Saqué una captura del primer cuadro desde el reproductor oficial de cada uno y las guardé en `public/videos/`.
-- **Escondí la barra del toggle** porque ya había tres formas de elegir área (pastillas del hero, "Ver mis…" y rieles). No la borré: sus radios son los que guardan la vista.
-- **Lentes: cada área cambia la mirada de toda la página.** Con el mismo `data-view` y solo CSS:
-  - **Redes sociales:** fondo más vivo y un aro de color en cada video, como las historias.
-  - **Diseño:** una grilla de 12 columnas de fondo y un marco de selección tipo Figma al pasar el mouse.
-  - **Programación:** fondo de puntos, títulos en tipografía mono y bordes punteados, como un plano técnico.
+**Qué cambié**
+- Textos simples. El toggle ahora dice Redes sociales · Diseño · Programación (antes Content · Design · Code) y cada área tiene un botón "Ver mis videos →", "Ver mis diseños →" o "Ver mis páginas web →". Esos botones usan `data-go`, que "clickea" el radio del toggle, así que no hay otro estado.
+- Menos CV. Saqué Experiencia y las tarjetas con números, y reescribí "Sobre mí" en primera persona.
+- Saqué la barra de navegación, porque competía con el toggle. Para volver a la portada ahora se toca mi nombre grande.
+- Hice un hero nuevo mirando una referencia (`referencias/image.png`): "PORTFOLIO" gigante, tarjetas como de vidrio a los costados y un dock de herramientas. Puse un abanico con tres trabajos, y las tres áreas son botones en la tarjeta de la derecha. La lista de áreas está en `profile.ts` (`areas`), así el hero y `SplitLayout` usan la misma.
+- Cambié la tipografía de los títulos por Bricolage Grotesque, que tiene más onda que Inter. La agregué como token (`--font-display`).
+- Cambié el salmón por verde agua. Como son tokens, alcanzó con cambiar `accent`, `accent-soft` y `accent-ink`. El verde agua va solo de fondo; para texto uso un verde petróleo porque tiene más contraste.
+- Muestro menos y lo elijo yo. En Redes sociales dejé 4 videos, en Diseño 2 por categoría y en Programación 3 sitios con el widget de GitHub abajo. A los videos sin portada les saqué una captura del primer cuadro.
+- Escondí la barra del toggle porque ya había otras formas de elegir área. No la borré: sus radios son los que guardan la vista.
+- Cada área cambia cómo se ve la página, solo con CSS y el mismo `data-view`. Redes sociales tiene un fondo más vivo y aros como las historias, Diseño una grilla tipo Figma y Programación un fondo de puntitos y títulos en mono.
+- El hero "se abre" al scrollear con `animation-timeline: scroll()`. Está adentro de `@supports`, así en Firefox (que no lo soporta) se ve quieto pero no se rompe.
 
-  El cambio se anima solo porque `ViewToggle` ya usaba la View Transitions API.
-- **Dentro de un área, solo lo que elegí.** La imagen de portada de cada columna (el celular, el collage, la captura grande) era un "ejemplo" que se repetía con los trabajos. Ahora tiene la clase `.pane-cover` y solo se ve en la portada.
-- **Botón "← Ver las tres áreas"** arriba de cada área. Antes la única forma de volver era tocar mi nombre, que recargaba la página. Para no crear otra fuente de estado, el botón solo tiene `data-show-all`, y el que lo atiende es `ViewToggle`: desmarca los radios, escribe `data-view="all"` y borra la vista guardada.
-- **El hero "se abre" al scrollear** (scroll-driven animations): con `animation-timeline: scroll()` la animación avanza con el scroll y no con el tiempo. Las letras de PORTFOLIO se separan, el abanico se abre y las tarjetas se van hacia los costados. Está adentro de `@supports`: en Firefox, que todavía no lo soporta, el hero se ve quieto y no se rompe. También respeta "reducir movimiento".
-- **Sumé el video de Hogar & Deco** a Redes sociales y saqué de `profile.ts` los tres que borré.
+**Responsive**
+- Revisé todo en tablet y mobile. 
+- En el celu el toggle no muestra los corchetes ni las flechas, porque con las palabras nuevas no entraba.
+- Cambié el favicon por la estrella del hero. Es un SVG con `@media (prefers-color-scheme: dark)` adentro, así en modo oscuro se pone verde agua.
 
-**Problemas**
-- **Probando el botón de volver con Chrome sin pantalla (headless)**, la vista quedaba "un paso atrasada". Era la animación: `startViewTransition` cambia la vista recién cuando el navegador dibuja un cuadro, y sin pantalla casi no dibuja. Con "reducir movimiento" (sin animación) anduvo perfecto, así que la lógica estaba bien. En el navegador normal funciona.
-
-**Responsive (revisión completa)**
-- Revisé la página en 390, 768, 1024 y 1440 px, en la portada y dentro de cada área. Arreglé:
-  - **Tablet y notebook chica:** las columnas recién se ponían lado a lado desde 1100px, así que en 1024 la página quedaba larguísima. Bajé el corte a 1024px.
-  - **Columnas apiladas:** cada título se alineaba distinto (izquierda, centro, derecha), lo que solo tiene sentido lado a lado. Apiladas, ahora van todas a la izquierda.
-  - **Hero a 1024px:** el abanico se pisaba con las tarjetas. Lo achiqué con `clamp()`.
-  - **Hero en celular y tablet:** arrancaba con la tarjeta de texto; ahora va primero el abanico, y en tablet las dos tarjetas quedan lado a lado.
-  - **Programación a 1024px:** el tercer sitio quedaba solo en otra fila; ahora entran los tres.
-  - **Contacto:** todavía decía "Contenido UGC". Lo cambié por palabras simples.
-- **Favicon nuevo:** la estrella de las pastillas del hero, en mi verde petróleo. El viejo eran dos rectángulos con el salmón de antes. Es un SVG con `@media (prefers-color-scheme: dark)` adentro: en modo oscuro la estrella pasa a verde agua para que se vea sobre la pestaña oscura.
-
-**Decisiones**
-- **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.
-- **En celular el toggle esconde los corchetes y las flechas.** Con palabras más largas no entraba en 390px, y esos signos son decorativos.
-
-**Pruebas**
-- Revisé la portada y la vista Programación a 1440×900 y la portada a 390px.
 
 ---
 
 ### Uso de IA
 
 Usé dos herramientas, cada una para algo distinto:
-- **Google Stitch:** para armar una maqueta visual de referencia de la portada en tres columnas. Use su codigo como referencia, la tomé como guía y la rehice con mis componentes y mis tokens.
-- **Claude Code** (dentro de VS Code): como asistente mientras programaba.
+- Google Stitch, para armar una maqueta visual de referencia de la portada en tres columnas. Use su codigo como referencia, la tomé como guía y la rehice con mis componentes y mis tokens.
+- Claude Code (dentro de VS Code), como asistente mientras programaba.
 
 **Para qué usé Claude Code**
 - Ayudarme a programar con Astro, ya que nunca lo habia utilizado.
 - Resolver dudas y que me explicara partes del código, por ejemplo cómo funcionan las container queries o la API de GitHub.
-- Encontrar la causa de errores, como el `@container` que quedaba en 0px.
-- Ayudarme con las partes más complejas, como el widget de GitHub, el estado `all` de la portada y la animación del toggle.
+- Encontrar por qué pasaban algunos errores, como el `@container` que quedaba en 0px.
+- Ayudarme con las partes más difíciles, como el widget de GitHub, el estado `all` de la portada y la animación del toggle.
 - Ordenar y redactar la bitácora y el README a partir de lo que yo iba haciendo y decidiendo.
 
 **Cómo trabajé con ella**
-- En `CLAUDE.md` le dejé reglas fijas: explicarme en español qué cambia antes de editar, hacer cambios chicos, comentar el código en español, no sumar frameworks ni dependencias sin preguntar y usar solo mis colores (tokens).
-- Le pedí que escribiera el README de a una sección, con mi voz de estudiante y no como IA. Revisé cada parte antes de hacer cada commit.
+- En `CLAUDE.md` le dejé reglas: explicarme en español qué iba a cambiar antes de editar, hacer cambios chicos, comentar el código en español, no sumar frameworks ni dependencias sin preguntarme y usar solo mis colores.
+- Le pedí que escribiera el README de a una sección y revisé cada parte antes de hacer cada commit.
 - Hice commits chicos para poder revisar cada cambio por separado.
 
 **Qué decidí yo**
@@ -349,10 +275,11 @@ Usé dos herramientas, cada una para algo distinto:
 - Que el toggle tenía que entenderse mejor, y cuáles de las propuestas hacer.
 
 **Qué revisé, cambié o descarté**
-- Cada vez que escribia en el Readme, me ocupaba de revisarlo y cambiarlo
+- Cada vez que escribia en el Readme, me ocupaba de revisarlo y cambiarlo.
+- Cada cambio que hacia se revisaba y chequeaba.
 
 
 **Problemas y límites que encontré**
-- **La IA no sabe lo que no le cuento.** A veces escribía cosas que no podía saber, como cómo está configurado el deploy. Por eso revisé todo lo que escribía antes de hacer cada commit.
-- **Detecté errores que la IA no vio,** como que los proyectos de Design desaparecían. Lo vi yo mirando el sitio, y después buscamos juntos la causa.
-- **La IA no puede probar todo por mí.** Las pruebas en mobile las hice yo.
+- La IA no sabe lo que no le cuento. A veces escribía cosas que no podía saber, como la configuración del deploy. Por eso revisé todo antes de cada commit.
+- Hubo errores que la IA no vio, como que los proyectos de Design desaparecían. Me di cuenta yo mirando el sitio y después buscamos juntas la causa.
+- La IA no puede probar todo por mí. Las pruebas en el celular las hice yo.
