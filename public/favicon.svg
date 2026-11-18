@@ -1,1 +1,12 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="#FAF9F6" stroke="#E4E4E7"/><rect x="5" y="9" width="10" height="14" rx="3" fill="#E09F93"/><rect x="17" y="9" width="10" height="14" rx="3" fill="#18181B"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Favicon: la estrella de las pastillas del hero, en mi verde petróleo (accent-ink).
+       En modo oscuro pasa a verde agua (accent) para que se vea sobre la pestaña oscura. -->
+  <style>
+    polygon { fill: #1b6b60; }
+    @media (prefers-color-scheme: dark) {
+      polygon { fill: #7fcfc3; }
+    }
+  </style>
+  <!-- 10 puntos: se alternan las 5 puntas (radio 15) y los 5 huecos (radio 6.2) alrededor del centro -->
+  <polygon points="16,2 19.6,12 30.3,12.4 21.9,18.9 24.8,29.1 16,23.2 7.2,29.1 10.1,18.9 1.7,12.4 12.4,12" />
+</svg>

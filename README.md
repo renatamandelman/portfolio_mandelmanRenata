@@ -308,6 +308,7 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
   - **Hero en celular y tablet:** arrancaba con la tarjeta de texto; ahora va primero el abanico, y en tablet las dos tarjetas quedan lado a lado.
   - **Programación a 1024px:** el tercer sitio quedaba solo en otra fila; ahora entran los tres.
   - **Contacto:** todavía decía "Contenido UGC". Lo cambié por palabras simples.
+- **Favicon nuevo:** la estrella de las pastillas del hero, en mi verde petróleo. El viejo eran dos rectángulos con el salmón de antes. Es un SVG con `@media (prefers-color-scheme: dark)` adentro: en modo oscuro la estrella pasa a verde agua para que se vea sobre la pestaña oscura.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.
