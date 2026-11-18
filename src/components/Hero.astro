@@ -318,7 +318,21 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
     to { translate: 0 40%; opacity: 0; }
   }
 
-  /* ---------- Desktop: tarjetas a los costados del abanico ---------- */
+  /* ---------- Celular y tablet: primero lo visual ----------
+     order: -1 sube el abanico arriba de las tarjetas (en el HTML está en el medio) */
+  @media (max-width: 1023px) {
+    .hero-fan { order: -1; margin-bottom: 1rem; }
+  }
+
+  /* ---------- Tablet: las dos tarjetas lado a lado, debajo del abanico ---------- */
+  @media (min-width: 640px) and (max-width: 1023px) {
+    .hero-stage { grid-template-columns: 1fr 1fr; align-items: stretch; }
+    .hero-fan { grid-column: 1 / -1; } /* el abanico ocupa las dos columnas */
+    .hero-card { max-width: none; }
+  }
+
+  /* ---------- Desktop: tarjetas a los costados del abanico ----------
+     clamp: en una notebook chica (1024px) el abanico y las tarjetas se achican para no pisarse */
   @media (min-width: 1024px) {
     .hero { min-height: 100dvh; justify-content: center; }
     .hero-stage {
@@ -328,6 +342,7 @@ const toolTones = ['bg-ink text-accent', 'bg-accent-ink text-cream', 'bg-accent 
     }
     .hero-stage > :first-child { justify-self: start; }
     .hero-stage > :last-child { justify-self: end; }
-    .hero-fan { width: 19rem; }
+    .hero-fan { width: clamp(14rem, 21vw, 19rem); }
+    .hero-card { max-width: clamp(15rem, 22vw, 20rem); }
   }
 </style>

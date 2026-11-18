@@ -95,8 +95,9 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 ## Responsive y accesibilidad
 
 **Responsive.** No quise que en el celular el sitio fuera la versión de escritorio achicada, así que cambia la forma de recorrerlo:
-- **Desktop (desde 1100px):** las tres columnas se ven una al lado de la otra. Al elegir una vista, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
-- **Mobile:** en la portada las columnas se apilan. Al elegir una vista se ve solo ese panel, y el toggle queda fijo arriba al scrollear para cambiar en cualquier momento. Al final de cada panel hay botones "Ver Diseño →", "Ver Programación →", etc., para seguir sin volver arriba.
+- **Desktop (desde 1024px, una notebook chica):** el hero muestra las tarjetas a los costados del abanico, que se achican con `clamp()` para no pisarse en pantallas chicas. Las tres columnas se ven una al lado de la otra y cada una se alinea según su lugar (izquierda, centro, derecha). Al elegir un área, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
+- **Tablet (640 a 1023px):** en el hero el abanico va primero y las dos tarjetas quedan lado a lado debajo. Las columnas se apilan, todas alineadas a la izquierda, que se lee mejor.
+- **Mobile:** en el hero, primero el abanico (lo visual) y después las tarjetas, una debajo de la otra; el dock se scrollea de costado. Al elegir un área se ve solo ese panel, con "← Ver las tres áreas" arriba y, al final, botones para ir a las otras áreas sin volver arriba.
 - Para que la imagen y los proyectos se acomoden lado a lado usé **container queries** (`@container`): dependen del ancho del panel, que cambia con el toggle, y no del ancho de la pantalla.
 - Probé a 390px (celular): portada y las tres vistas.
 
@@ -298,6 +299,15 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 
 **Problemas**
 - **Probando el botón de volver con Chrome sin pantalla (headless)**, la vista quedaba "un paso atrasada". Era la animación: `startViewTransition` cambia la vista recién cuando el navegador dibuja un cuadro, y sin pantalla casi no dibuja. Con "reducir movimiento" (sin animación) anduvo perfecto, así que la lógica estaba bien. En el navegador normal funciona.
+
+**Responsive (revisión completa)**
+- Revisé la página en 390, 768, 1024 y 1440 px, en la portada y dentro de cada área. Arreglé:
+  - **Tablet y notebook chica:** las columnas recién se ponían lado a lado desde 1100px, así que en 1024 la página quedaba larguísima. Bajé el corte a 1024px.
+  - **Columnas apiladas:** cada título se alineaba distinto (izquierda, centro, derecha), lo que solo tiene sentido lado a lado. Apiladas, ahora van todas a la izquierda.
+  - **Hero a 1024px:** el abanico se pisaba con las tarjetas. Lo achiqué con `clamp()`.
+  - **Hero en celular y tablet:** arrancaba con la tarjeta de texto; ahora va primero el abanico, y en tablet las dos tarjetas quedan lado a lado.
+  - **Programación a 1024px:** el tercer sitio quedaba solo en otra fila; ahora entran los tres.
+  - **Contacto:** todavía decía "Contenido UGC". Lo cambié por palabras simples.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

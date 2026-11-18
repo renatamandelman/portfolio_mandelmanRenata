@@ -21,7 +21,7 @@
  *   content / design / code → las escribe ViewToggle.
  *                             Se ven la imagen y los proyectos de esa área (.more).
  *                             Desktop: ese panel grande y los otros dos como rieles.
- *                             Mobile (< 1100px): solo el panel elegido.
+ *                             Mobile y tablet (< 1024px): solo el panel elegido.
  */
 import BaseLayout from './BaseLayout.astro';
 import ViewToggle from '../components/ViewToggle.astro';
@@ -159,7 +159,7 @@ const views = areas;
 
   .pane { min-width: 0; view-transition-name: var(--vt-name); }
   .pane--content { --vt-name: pane-content; }
-  .pane--design { --vt-name: pane-design; text-align: center; }
+  .pane--design { --vt-name: pane-design; }
   .pane--code { --vt-name: pane-code; }
 
   .pane-body { padding: 2rem 1.5rem 3rem; }
@@ -243,8 +243,12 @@ const views = areas;
     display: none;
   }
 
-  /* ---------- DESKTOP: tres columnas ---------- */
-  @media (min-width: 1100px) {
+  /* ---------- DESKTOP (desde 1024px, una notebook chica): tres columnas ---------- */
+  @media (min-width: 1024px) {
+    /* Lado a lado, cada columna se alinea según su lugar: izquierda / centro / derecha.
+       Apiladas (mobile y tablet) todas van a la izquierda, que se lee mejor */
+    .pane--design { text-align: center; }
+
     .split {
       --c1: 1fr;
       --c2: 1fr;
