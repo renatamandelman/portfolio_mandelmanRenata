@@ -1,7 +1,7 @@
 # Renata Mandelman — Portfolio "Split View"
 
 Portfolio personal e interactivo para el Examen Final de **Programación Multimedial IV**.
-Una pantalla dividida entre **Creación de Contenido / RRSS**, **Diseño** y **Desarrollo Web**: quien visita elige el modo de lectura con el toggle `[ CONTENT ⇄ DESIGN ⇄ CODE ]`.
+Hago videos para redes, diseño y páginas web. El sitio es una pantalla dividida en esas tres partes, y quien entra elige por dónde empezar con el toggle `[ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]`.
 
 **¿Para quién es?** 
 Para las personas que me pueden contratar o convocar: marcas y agencias que buscan creadoras UGC, estudios de diseño y equipos de desarrollo web. Cada una puede ir directo a su área sin pasar por las otras, y al mismo tiempo ver que las tres conviven en mi trabajo.
@@ -36,7 +36,7 @@ npm run preview    # sirve /dist localmente para probar el build
 
 ## Componentes propios
 
-**`ViewToggle.astro`**: es el botón `[ CONTENT ⇄ DESIGN ⇄ CODE ]` y el foco del sitio. Cuando elegís una opción, guarda cuál es en `<html data-view>` y el CSS cambia la pantalla según eso. Lo hice con radios en vez de botones porque así ya funciona con teclado y con lectores de pantalla sin que yo tenga que programarlo. También se acuerda de la última vista que elegiste (con `localStorage`). Cuando entrás por primera vez no hay ninguna opción marcada y ves la portada con las tres columnas.
+**`ViewToggle.astro`**: es el botón `[ REDES SOCIALES ⇄ DISEÑO ⇄ PROGRAMACIÓN ]` y el foco del sitio. Cuando elegís una opción, guarda cuál es en `<html data-view>` y el CSS cambia la pantalla según eso. Lo hice con radios en vez de botones porque así ya funciona con teclado y con lectores de pantalla sin que yo tenga que programarlo. También se acuerda de la última vista que elegiste (con `localStorage`). Cuando entrás por primera vez no hay ninguna opción marcada y ves la portada con las tres columnas.
 
 **`ProjectCard.astro`**: es la tarjeta de cada marca con la que trabajé como creadora de contenido. Al tocarla se abre un modal con lo que hice y los videos. Usé `<dialog>` porque ya trae el cierre con Esc y el manejo del foco. Los videos de TikTok se cargan recién cuando tocás play, para que la página no tarde más de lo necesario.
 
@@ -92,7 +92,7 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 
 **Responsive.** No quise que en el celular el sitio fuera la versión de escritorio achicada, así que cambia la forma de recorrerlo:
 - **Desktop (desde 1100px):** las tres columnas se ven una al lado de la otra. Al elegir una vista, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
-- **Mobile:** en la portada las columnas se apilan. Al elegir una vista se ve solo ese panel, y el toggle queda fijo arriba al scrollear para cambiar en cualquier momento. Al final de cada panel hay botones "Ver Design →", "Ver Code →", etc., para seguir sin volver arriba.
+- **Mobile:** en la portada las columnas se apilan. Al elegir una vista se ve solo ese panel, y el toggle queda fijo arriba al scrollear para cambiar en cualquier momento. Al final de cada panel hay botones "Ver Diseño →", "Ver Programación →", etc., para seguir sin volver arriba.
 - Para que la imagen y los proyectos se acomoden lado a lado usé **container queries** (`@container`): dependen del ancho del panel, que cambia con el toggle, y no del ancho de la pantalla.
 - Probé a 390px (celular): portada y las tres vistas.
 
@@ -252,7 +252,29 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
 - **La animación del toggle es solo CSS** (`@keyframes` y un `animation-delay` distinto por opción) y depende de `data-view="all"`, así que no sumé JavaScript ni otra fuente de estado. Cuando elegís una vista desaparece sola. Si la persona tiene activado "reducir movimiento", no se anima.
 
+---
 
+### Día 5 (tarde) — Testeo con usuarios y cambios
+
+**El testeo**
+- Le mostré el portfolio publicado a _(completar: cuántas personas y quiénes, por ejemplo amigos, familia o compañeros)_ sin explicarles nada.
+- **Nadie sabía dónde tocar:** no se daban cuenta de que el toggle abría los trabajos.
+- **Parecía un CV:** lo que se leía de corrido era "Sobre mí", "Experiencia" y números, y casi no se veía trabajo.
+- Me di cuenta de que mi portfolio está pensado para marcas y emprendimientos, y muchos no saben qué es "UGC", "frontend" o "engagement". Tenía que hablar como ellos.
+
+**Qué cambié por el testeo**
+- **Textos que entienda cualquiera:** el toggle ahora dice **Redes sociales · Diseño · Programación** (antes Content · Design · Code). Debajo de mi nombre hay una frase que dice qué hago, y las columnas tienen subtítulos en lenguaje simple ("Videos para que más gente conozca tu marca").
+- **Un botón para cada área:** cada columna de la portada termina con "Ver mis videos →", "Ver mis diseños →" o "Ver mis páginas web →". Reusan los mismos `data-go` que los rieles, que "clickean" el radio del toggle, así no sumé otra fuente de estado.
+- **Trabajo real en la portada:** saqué las maquetas (el frame de Figma con la paleta y el editor con código de ejemplo). Ahora Diseño muestra un collage con 3 trabajos de Behance y Programación una captura de un sitio que hice (Mentes Brillantes), y cada uno lleva al proyecto real.
+- **Menos CV:** saqué la sección Experiencia y reescribí "Sobre mí" en primera persona y sin jerga.
+- **Refresh visual:** el bloque del nombre tapa las líneas entre columnas, los subtítulos se leen como frases y los botones van en mi salmón con texto oscuro. La portada entra en una pantalla de 1440×900.
+
+**Decisiones**
+- **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.
+- **En celular el toggle esconde los corchetes y las flechas.** Con palabras más largas no entraba en 390px, y esos signos son decorativos.
+
+**Pruebas**
+- Revisé la portada y la vista Programación a 1440×900 y la portada a 390px.
 
 ---
 

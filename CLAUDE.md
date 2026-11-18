@@ -8,7 +8,7 @@ Entrega: 19/11/2026. Defensa individual con modificación de código en vivo: **
 - TypeScript en los `<script>` de los componentes.
 
 ## Arquitectura
-- Estado de la vista en `<html data-view="content|split|code">`. Lo escribe `ViewToggle.astro`, lo lee el CSS de `SplitLayout.astro`. No crear otra fuente de estado.
+- Estado de la vista en `<html data-view="all|content|design|code">` (all = portada; en pantalla se leen "Redes sociales · Diseño · Programación"). Lo escribe `ViewToggle.astro`, lo lee el CSS de `SplitLayout.astro`. No crear otra fuente de estado.
 - Datos del CV en `src/data/profile.ts`. Los componentes reciben datos por props; no hardcodear contenido en el markup.
 - Componentes propios: `ViewToggle` (hecho), `ProjectCard` (modal con `<dialog>`), `DynamicApiWidget` (GitHub API con estados loading / success / error).
 
