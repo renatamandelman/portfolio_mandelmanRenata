@@ -32,11 +32,6 @@ interface Props {
   description?: string;
 }
 
-const navLinks = [
-  { href: '#sobre-mi', label: 'Sobre mí' },
-  { href: '#contacto', label: 'Contacto' },
-];
-
 // Las tres vistas, en el mismo orden que el toggle.
 // Se usan para armar los rieles y los botones "Ver …" de cada panel.
 const views = [
@@ -48,28 +43,6 @@ const views = [
 ---
 
 <BaseLayout {...Astro.props}>
-  <header class="site-header border-b border-line">
-    <div
-      class="mx-auto flex max-w-[1440px] flex-col items-center gap-3 px-6 py-4 sm:grid sm:grid-cols-[1fr_auto_1fr] md:px-10"
-    >
-      <!-- data-home: además de ir a "/", borra la vista guardada para volver al inicio (ver script) -->
-      <a href="/" data-home class="text-sm font-bold tracking-wide whitespace-nowrap uppercase">Renata Mandelman</a>
-      <nav aria-label="Principal">
-        <ul class="flex gap-5 text-[0.6875rem] tracking-[0.14em] whitespace-nowrap uppercase md:gap-10 md:text-xs">
-          {
-            navLinks.map((link) => (
-              <li>
-                <a href={link.href} class="transition-colors hover:text-accent-ink">
-                  {link.label}
-                </a>
-              </li>
-            ))
-          }
-        </ul>
-      </nav>
-   
-    </div>
-  </header>
 
   <!-- relative: referencia para ubicar el nombre flotante de la portada -->
   <main id="main" class="relative mx-auto max-w-[1440px]">
@@ -294,7 +267,7 @@ const views = [
 
     /* Las columnas ocupan la pantalla (menos el header) y las líneas suben detrás del nombre */
     :global(html[data-view='all']) .split {
-      min-height: calc(100dvh - 3.5rem);
+      min-height: 100dvh;
       border-top: 0;
     }
     /* Cada columna: título arriba (debajo del nombre) y la imagen debajo */
@@ -304,7 +277,7 @@ const views = [
       display: flex;
       flex-direction: column;
       gap: 0.5rem;
-      padding-top: 18rem; /* lugar para el nombre, la frase, el toggle y la pista que flotan arriba */
+      padding-top: 19.5rem; /* lugar para el nombre, el rol, la frase, el toggle y la pista que flotan arriba */
     }
 
     /* Vista inicial: las tres columnas iguales (los valores por defecto de arriba).
@@ -352,19 +325,6 @@ const views = [
 </style>
 
 <script>
-  // Reloj del header: hora de Buenos Aires, se actualiza cada 30 segundos
-  const clock = document.querySelector<HTMLTimeElement>('[data-clock]');
-  const formatTime = new Intl.DateTimeFormat('es-AR', {
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'America/Argentina/Buenos_Aires',
-  });
-  const tick = () => {
-    if (clock) clock.textContent = formatTime.format(new Date());
-  };
-  tick();
-  setInterval(tick, 30_000);
-
   // Rieles y botones "Ver …": cada uno lleva a la vista de su data-go
   // "clickeando" ese radio del toggle, así toda la lógica de estado sigue
   // viviendo en un solo lugar (ViewToggle).
@@ -377,7 +337,7 @@ const views = [
     });
   });
 
-  // Nombre del header: borra la vista guardada antes de navegar a "/",
+  // Nombre (link al inicio): borra la vista guardada antes de navegar a "/",
   // así la página vuelve a cargar en la vista inicial ("all").
   // 'rm-view' es la misma clave que usan ViewToggle y BaseLayout.
   document.querySelector('[data-home]')?.addEventListener('click', () => {

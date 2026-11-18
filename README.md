@@ -99,7 +99,7 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 **Accesibilidad.**
 - **Elementos nativos:** el toggle son radios, los modales son `<dialog>` y todo lo que se toca es un `<button>` o un link. Así funciona con teclado (Tab, flechas, Esc) sin programarlo aparte.
 - **Foco visible:** cuando navegás con teclado, todo lo que tiene foco muestra un borde oscuro.
-- **Link "Saltar al contenido":** es lo primero que aparece al tocar Tab y lleva directo al contenido sin pasar por el header.
+- **Link "Saltar al contenido":** es lo primero que aparece al tocar Tab y lleva directo al contenido principal.
 - **Imágenes:** las imágenes de los proyectos tienen `alt=""` a propósito, porque el link ya tiene el nombre del proyecto en texto y el lector lo diría dos veces. Los videos embebidos tienen un `title` con la marca y el nombre del video.
 
 ## Limitaciones y mejoras
@@ -270,6 +270,7 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - **Refresh visual:** el bloque del nombre tapa las líneas entre columnas, los subtítulos se leen como frases y los botones van en mi salmón con texto oscuro. La portada entra en una pantalla de 1440×900.
 - **Saqué las tarjetas de números de Redes sociales** (marcas, videos, interacción): eran más "datos de CV" que trabajo. Ahora esa columna muestra solo mi reel.
 - **Tipografía nueva para mi nombre y los títulos: Bricolage Grotesque.** Inter en mayúsculas se veía seca. Bricolage es más amable y tiene más personalidad, y la escribo en minúsculas para que se sienta más cercana. La sumé como token (`--font-display` en `global.css`), así Tailwind genera la clase `font-display` y cambiarla es tocar una sola línea.
+- **Saqué la barra de navegación de arriba.** Tenía solo dos links (Sobre mí y Contacto) y competía con el toggle, que es la navegación real del sitio. El nombre chico de la barra era la forma de volver a la portada, así que pasé esa función a mi nombre grande: es un link a "/" con el mismo `data-home` de antes. Debajo del nombre sumé "Diseñadora multimedial".
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

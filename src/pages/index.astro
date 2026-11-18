@@ -42,14 +42,16 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
 
 <SplitLayout>
   <!-- ============ HERO ============ -->
-  <!-- Nombre + rol. En la portada (desktop) SplitLayout lo hace flotar arriba al centro -->
+  <!-- Nombre + rol + frase. En la portada (desktop) SplitLayout lo hace flotar arriba al centro -->
   <Fragment slot="hero">
     <h1
       class="font-display text-5xl leading-[0.95] font-extrabold tracking-tight md:text-6xl xl:text-[4.25rem]"
     >
-      <!-- En mobile el nombre va en dos líneas; desde md, en una -->
-      Renata <br class="md:hidden" />Mandelman
+      <!-- El nombre es el link para volver al inicio (portada). data-home: el script de SplitLayout
+           borra la vista guardada antes de navegar. En mobile va en dos líneas; desde md, en una -->
+      <a href="/" data-home class="transition-colors hover:text-accent-ink">Renata <br class="md:hidden" />Mandelman</a>
     </h1>
+    <p class="eyebrow mt-3 text-ink">{profile.role}</p>
     <!-- max-w: la frase se corta en dos renglones en vez de estirar el bloque del nombre -->
     <p class="mx-auto mt-3 max-w-sm text-base leading-snug text-muted md:max-w-md md:text-lg">
       {profile.tagline}

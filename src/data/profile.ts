@@ -34,6 +34,7 @@ export interface Experience {
 export const profile = {
   name: 'Renata Mandelman',
   location: 'CABA, Buenos Aires, Argentina',
+  role: 'Diseñadora multimedial', // va justo debajo del nombre
   // Frase debajo del nombre: qué hago, dicho para que lo entienda cualquiera
   tagline: 'Hago videos para redes, diseño y páginas web para marcas y emprendimientos.',
   github: 'renatamandelman', // lo usa también DynamicApiWidget para la API de GitHub
