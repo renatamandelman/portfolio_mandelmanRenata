@@ -64,9 +64,29 @@ Otras decisiones importantes:
 
 ## API / fuente dinámica
 
-Utilice la fuente de Behance para traer los proyectos.
+Uso la **API pública de GitHub**, sin token:
 
-**`DynamicApiWidget.astro`**: trae mis proyectos de programación desde la API de GitHub. Muestra solo los repos que tienen el topic `portfolio`, así para sumar un proyecto nuevo no tengo que tocar el código. Mientras carga muestra un aviso, y si la API falla se siguen viendo los proyectos que tengo cargados a mano, con un botón para reintentar.
+```
+GET https://api.github.com/users/renatamandelman/repos?per_page=100&sort=updated
+```
+
+**Qué información obtengo:** la lista de mis repositorios. De cada uno uso el nombre, la descripción, la URL del sitio publicado (el campo "Website") y los *topics*. Muestro solo los repos que tienen el topic `portfolio` y una URL publicada. Así, para sumar un proyecto al portfolio no toco el código: en GitHub le pongo el topic y el link de Vercel, y aparece solo.
+
+**Cómo se integra:** los proyectos de Code salen de dos lugares. Algunos los cargué a mano en `profile.ts` y se ven siempre. Los de GitHub se suman al final de la misma lista, con la misma tarjeta (`ProjectLink`), así quien visita no nota la diferencia. Si un repo apunta a un sitio que ya está en la lista, no lo repito.
+
+**Estados y qué pasa si algo falla:**
+- **Cargando:** mientras espera la respuesta, debajo de la lista aparece "Cargando más proyectos…".
+- **Con datos:** se agregan los proyectos y el aviso desaparece.
+- **Sin proyectos nuevos (vacío):** si GitHub responde pero ningún repo tiene el topic, no muestro ningún error, porque los proyectos de `profile.ts` ya están. La lista nunca queda vacía.
+- **Error:** distingo tres casos con mensajes distintos: sin conexión, límite de pedidos (GitHub responde 403) y cualquier otro error de GitHub. En los tres casos los proyectos fijos se siguen viendo y aparece un botón **"Reintentar"**.
+
+**Límites:** sin token, GitHub permite **60 pedidos por hora por IP**. Para un portfolio alcanza, porque cada visita hace un solo pedido. Si se pasa, aviso que hay que probar en un rato. No usé token porque en un sitio estático quedaría visible en el código del navegador.
+
+Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) y la lista se marca como "ocupada" mientras carga (`aria-busy`).
+
+**Proyectos de diseño (Behance):** quise traerlos de Behance, pero su API pública está cerrada. Por eso los cargué en `profile.ts`, con las imágenes guardadas en `public/design/`, y cada tarjeta lleva a su proyecto en Behance.
+
+
 
 ## Responsive y accesibilidad
 
