@@ -90,11 +90,25 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 
 ## Responsive y accesibilidad
 
-_Completar en Días 9-10._
+**Responsive.** No quise que en el celular el sitio fuera la versión de escritorio achicada, así que cambia la forma de recorrerlo:
+- **Desktop (desde 1100px):** las tres columnas se ven una al lado de la otra. Al elegir una vista, esa columna se agranda y las otras dos quedan como rieles finitos que se pueden tocar para cambiar.
+- **Mobile:** en la portada las columnas se apilan. Al elegir una vista se ve solo ese panel, y el toggle queda fijo arriba al scrollear para cambiar en cualquier momento. Al final de cada panel hay botones "Ver Design →", "Ver Code →", etc., para seguir sin volver arriba.
+- Para que la imagen y los proyectos se acomoden lado a lado usé **container queries** (`@container`): dependen del ancho del panel, que cambia con el toggle, y no del ancho de la pantalla.
+- Probé a 390px (celular): portada y las tres vistas.
+
+**Accesibilidad.**
+- **Elementos nativos:** el toggle son radios, los modales son `<dialog>` y todo lo que se toca es un `<button>` o un link. Así funciona con teclado (Tab, flechas, Esc) sin programarlo aparte.
+- **Foco visible:** cuando navegás con teclado, todo lo que tiene foco muestra un borde oscuro.
+- **Link "Saltar al contenido":** es lo primero que aparece al tocar Tab y lleva directo al contenido sin pasar por el header.
+- **Imágenes:** las imágenes de los proyectos tienen `alt=""` a propósito, porque el link ya tiene el nombre del proyecto en texto y el lector lo diría dos veces. Los videos embebidos tienen un `title` con la marca y el nombre del video.
 
 ## Limitaciones y mejoras
 
-_Completar._
+Cosas que sé que todavía se pueden mejorar:
+- **El toggle no se entiende del todo a primera vista.** En la portada no hay ninguna opción marcada y parece un subtítulo más que un botón. Quiero que las opciones se vean como botones y sumar una pista también en desktop.
+- **Los proyectos de diseño se cargan a mano.** Como la API de Behance está cerrada, cada proyecto nuevo lo tengo que sumar en `profile.ts`.
+- **Límite de GitHub.** Sin token son 60 pedidos por hora por IP. Si alguna vez no alcanza, la mejora sería traer los repos en el momento del build en vez de en el navegador.
+
 
 ## Créditos y uso de IA
 
@@ -196,7 +210,7 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - Subí el sitio a Vercel: https://portfolio-mandelman-renata.vercel.app. Como es estático, no tuve que configurar nada (Vercel detecta Astro solo). Después actualicé `site` en `astro.config.mjs` con la URL real.
 
 **Pruebas de pantalla**
-- [ ] 390px: portada, Content, Design, Code
+- [x] 390px: portada, Content, Design, Code
 - [ ] 1440px: portada, Content, Design, Code
 - [ ] Sitio publicado en el celular
 
