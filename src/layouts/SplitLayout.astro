@@ -86,10 +86,11 @@ const views = [
       <div class="toggle-dock">
         <ViewToggle />
       </div>
-    </div>
 
-    <!-- Pista para mobile: solo se ve en la vista inicial (la muestra el CSS según data-view) -->
-    <p class="view-hint px-6 text-center text-xs text-muted">Tocá Content, Design o Code para ver cada área</p>
+      <!-- Pista: solo se ve en la portada (la muestra el CSS según data-view).
+           Está dentro de .identity para que en desktop flote junto al nombre y el toggle -->
+      <p class="view-hint px-6 text-center text-xs text-muted">Elegí Content, Design o Code para ver cada área</p>
+    </div>
 
     <!-- SPLIT: tres paneles. Cada uno tiene un riel (se ve cuando el panel está colapsado)
          y, al final, botones para ir a las otras vistas (solo mobile) -->
@@ -237,13 +238,14 @@ const views = [
       transition: grid-template-columns 0.5s var(--ease-out-soft);
     }
 
-    /* En desktop se ven todos los paneles y divisores; la pista y los botones "Ver …" no hacen falta */
+    /* En desktop se ven todos los paneles y divisores; los botones "Ver …" no hacen falta */
     .pane,
     .divider { display: block; }
     .divider { height: auto; }
-    .view-hint,
-    :global(html[data-view='all']) .view-hint,
     .pane-next { display: none; }
+
+    /* La pista flota debajo del toggle (en la portada el toggle no tiene espacio abajo) */
+    .view-hint { margin-top: 0.75rem; padding-bottom: 0; }
 
     .pane-body { padding: 2.5rem clamp(1.25rem, 2.5vw, 2.5rem); }
 

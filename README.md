@@ -105,7 +105,6 @@ Los cambios de estado también se anuncian a lectores de pantalla (`aria-live`) 
 ## Limitaciones y mejoras
 
 Cosas que sé que todavía se pueden mejorar:
-- **El toggle no se entiende del todo a primera vista.** En la portada no hay ninguna opción marcada y parece un subtítulo más que un botón. Quiero que las opciones se vean como botones y sumar una pista también en desktop.
 - **Los proyectos de diseño se cargan a mano.** Como la API de Behance está cerrada, cada proyecto nuevo lo tengo que sumar en `profile.ts`.
 - **Límite de GitHub.** Sin token son 60 pedidos por hora por IP. Si alguna vez no alcanza, la mejora sería traer los repos en el momento del build en vez de en el navegador.
 
@@ -215,9 +214,9 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - [ ] Sitio publicado en el celular
 
 **Pendiente**
-- Los links "Proyectos" y "Experiencia" del header apuntan a partes que en la portada están ocultas.
-- La foto del reel pesa 462 KB y se ve chiquita: achicarla.
-- Completar las otras secciones de este README.
+- Los links "Proyectos" y "Experiencia" del header apuntan a partes que en la portada están ocultas. _(Experiencia: resuelto el Día 5)_
+- ~~La foto del reel pesa 462 KB y se ve chiquita: achicarla.~~ _(resuelto el Día 5: 216 KB)_
+- ~~Completar las otras secciones de este README.~~ _(resuelto el Día 5)_
 
 ---
 
@@ -230,14 +229,19 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - Sumé mi **foto en "Sobre mí"**, recortada en círculo y con el texto centrado al lado.
 - Saqué las etiquetas del final de cada columna ("Creative Lab", "Diseño UI/UX", "Desarrollo"): repetían lo que ya dice el título de arriba.
 - Cambié el título de la pestaña a "Renata Mandelman - Portfolio".
+- Cambié los subtítulos de las columnas para que las tres tengan el mismo formato: "Edición · Reels · UGC · Community" en Content (antes decía "Diseño multimedial, desarrollo y RRSS", que eran cosas de las otras columnas) y "Frontend · Astro · React · APIs" en Code.
+- **Hice que el toggle se entienda en la portada.** Al entrar no hay ninguna opción marcada y parecía un subtítulo, no algo para tocar. Ahora, solo en la portada:
+  - cada opción tiene fondo rosado, como un botón, y se pinta al pasar el mouse;
+  - al cargar, las tres se iluminan una tras otra (Content → Design → Code) dos veces y se quedan quietas;
+  - debajo aparece la pista "Elegí Content, Design o Code para ver cada área", que antes solo se veía en mobile.
 
 **Decisiones**
-- **El link "Experiencia" del header ahora lleva a algo.** Antes apuntaba a la lista de marcas del panel Content, que en la portada está oculta. La sección nueva está fuera de las columnas, así que se ve en todas las vistas.
+- **El link "Experiencia" del header ahora lleva a algo.** 
 - **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
+- **La animación del toggle es solo CSS** (`@keyframes` y un `animation-delay` distinto por opción) y depende de `data-view="all"`, así que no sumé JavaScript ni otra fuente de estado. Cuando elegís una vista desaparece sola. Si la persona tiene activado "reducir movimiento", no se anima.
 
-**Problemas**
-- Reemplacé la portada del video de Vichy y borré el archivo viejo, pero `profile.ts` seguía apuntando a él y el celular de la portada se quedaba sin imagen. Aprendí que cuando cambio un archivo de `public/` tengo que revisar dónde se usa su ruta.
-- La primera versión nueva era un PNG de 2,8 MB, mucho más pesado que la anterior. La volví a exportar en JPG y quedó en 216 KB.
+**Pruebas**
+- Probé la portada a 390px y a 1440px con el toggle nuevo: entra en una línea en mobile y no aparece scroll horizontal.
 
 ---
 
@@ -250,3 +254,7 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 | `DynamicApiWidget` y `ProjectLink` (API de GitHub) | Claude Code | Usar GitHub con topics en vez de cargar los proyectos a mano; qué repos mostrar; juntar todo en una sola lista. | _completar_ |
 | Bug del `@container` en 0px | Claude Code | Lo detecté yo al ver que no aparecían los proyectos de Design. | _completar_ |
 | Redacción de esta bitácora | Claude Code | Pedí que la fuera escribiendo a partir de lo que hacíamos; la reviso y la corrijo yo. | _completar_ |
+| Completar el README (público, componentes, tecnologías, API, responsive, limitaciones) | Claude Code | Que lo escriba de a una sección y en mi voz de estudiante, no como IA; revisé cada parte antes de cada commit; corregí lo de Behance y saqué cosas que sobraban. | _completar_ |
+| Cambio de nombre a "Split View" | Claude Code | Me di cuenta de que "Dual" ya no tenía sentido con tres áreas y elegí el nombre nuevo entre las opciones. | _completar_ |
+| Sección Experiencia y foto en "Sobre mí" | Claude Code | La idea de poner mi CV debajo de "Sobre mí", separarlo en Actual y Terminado, la foto redonda con el texto centrado, sacar las etiquetas de las columnas y los subtítulos nuevos. | _completar_ |
+| Toggle más claro en la portada | Claude Code | Detecté que no se entendía que había que tocarlo; elegí cuáles de las propuestas hacer (botones, animación y pista). | _completar_ |

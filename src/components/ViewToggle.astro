@@ -123,6 +123,33 @@ const options: { value: View; label: string; srLabel: string }[] = [
     outline-offset: 2px;
   }
 
+  /* ---------- Portada (data-view="all"): que se entienda que hay que tocarlo ----------
+     No hay ninguna opción marcada, así que sin esto el toggle parece un subtítulo. */
+
+  /* 1. Cada opción se ve como un botón: fondo suave y texto oscuro */
+  :global(html[data-view='all']) .option {
+    background: var(--color-accent-soft);
+    color: var(--color-ink);
+    transition: background-color 0.25s var(--ease-out-soft);
+  }
+  :global(html[data-view='all']) .option:hover { background: var(--color-accent); }
+
+  /* 2. Invitación: las opciones se iluminan una tras otra, dos veces, y se quedan quietas.
+     Solo si la persona no pidió "reducir movimiento" en su sistema */
+  @media (prefers-reduced-motion: no-preference) {
+    :global(html[data-view='all']) .option {
+      animation: invite 1.2s var(--ease-out-soft) 2;
+    }
+    /* Cada opción arranca un poco después que la anterior: Content → Design → Code */
+    :global(html[data-view='all']) .option[data-option='design'] { animation-delay: 0.2s; }
+    :global(html[data-view='all']) .option[data-option='code'] { animation-delay: 0.4s; }
+  }
+
+  @keyframes invite {
+    0%, 100% { background: var(--color-accent-soft); }
+    30% { background: var(--color-accent); }
+  }
+
   /* Pastilla deslizante: se posiciona con variables que setea el script */
   .thumb {
     position: absolute;
