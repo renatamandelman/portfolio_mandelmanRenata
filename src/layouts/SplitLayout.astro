@@ -223,17 +223,20 @@ const views = [
   .pane-cta {
     display: none;
     width: fit-content;
-    margin: 1.5rem auto 0; /* auto a los costados: centrado */
+    margin: 1rem auto 0; /* auto a los costados: centrado */
     padding: 0.75rem 1.5rem;
     border-radius: var(--radius-pill);
-    background: var(--color-ink);
-    color: var(--color-cream);
+    /* Salmón de fondo con texto oscuro: contraste 8:1 (el salmón nunca va como color de texto) */
+    background: var(--color-accent);
+    color: var(--color-ink);
     font-size: 0.875rem;
     font-weight: 700;
     cursor: pointer;
-    transition: background-color 0.25s var(--ease-out-soft);
+    transition:
+      background-color 0.25s var(--ease-out-soft),
+      color 0.25s var(--ease-out-soft);
   }
-  .pane-cta:hover { background: var(--color-accent-ink); }
+  .pane-cta:hover { background: var(--color-ink); color: var(--color-cream); }
   :global(html[data-view='all']) .pane-cta { display: block; }
 
   /* El riel solo existe en desktop */
@@ -282,6 +285,9 @@ const views = [
       flex-direction: column;
       align-items: center;
       width: max-content;
+      /* Fondo crema: tapa las líneas entre columnas para que no corten el nombre */
+      padding: 0 2.5rem 1rem;
+      background: var(--color-cream);
     }
     /* El toggle viaja con el nombre (no sticky) */
     :global(html[data-view='all']) .toggle-dock { position: static; padding-bottom: 0; }
@@ -297,8 +303,8 @@ const views = [
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      padding-top: 19rem; /* lugar para el nombre, la frase, el toggle y la pista que flotan arriba */
+      gap: 0.5rem;
+      padding-top: 18rem; /* lugar para el nombre, la frase, el toggle y la pista que flotan arriba */
     }
 
     /* Vista inicial: las tres columnas iguales (los valores por defecto de arriba).

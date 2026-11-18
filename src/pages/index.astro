@@ -67,7 +67,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
       >
         Redes sociales
       </h2>
-      <p class="eyebrow mt-1">Videos para que más gente conozca tu marca</p>
+      <p class="mt-2 text-sm text-muted md:text-base">Videos para que más gente conozca tu marca</p>
     </header>
 
     <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
@@ -76,7 +76,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
     <div class="@container">
       <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
         <!-- IMAGEN: métricas + engagement a la izquierda, celular a la derecha (grilla de 12 columnas) -->
-        <div class="mx-auto my-6 grid w-full max-w-md grid-cols-12 items-start gap-2.5">
+        <div class="mx-auto my-5 grid w-full max-w-md grid-cols-12 items-start gap-2.5">
           <!-- Celular con Reels: muestra heroVideo. El reproductor de TikTok se carga
                recién al tocar play (lo agrega el script de abajo). -->
           <div
@@ -159,7 +159,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
       >
         Diseño
       </h2>
-      <p class="eyebrow mt-1">Logos, piezas gráficas, apps y animación</p>
+      <p class="mt-2 text-sm text-muted md:text-base">Logos, piezas gráficas, apps y animación</p>
     </header>
 
     <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
@@ -169,7 +169,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
       <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
         <!-- IMAGEN: collage con 3 trabajos reales. El primero (destacado) ocupa las dos filas de la izquierda.
              Cada uno lleva a su proyecto en Behance -->
-        <ul class="mx-auto my-6 grid w-full max-w-md grid-cols-2 grid-rows-2 gap-2.5">
+        <ul class="mx-auto my-5 grid w-full max-w-md grid-cols-2 grid-rows-2 gap-2.5">
           {
             designPreview.map((work, i) => (
               <li class={i === 0 ? 'row-span-2' : ''}>
@@ -265,7 +265,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
       >
         Programación
       </h2>
-      <p class="eyebrow mt-1">Páginas web que se ven bien en el celular</p>
+      <p class="mt-2 text-sm text-muted md:text-base">Páginas web que se ven bien en el celular</p>
     </header>
 
     <!-- Imagen + proyectos. @container: se acomoda al ancho del PANEL.
@@ -281,7 +281,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
               href={featuredSite.url}
               target="_blank"
               rel="noopener noreferrer"
-              class="tilt bento group mx-auto my-6 block w-full max-w-md overflow-hidden text-left shadow-xl"
+              class="tilt bento group mx-auto my-5 block w-full max-w-md overflow-hidden text-left shadow-xl"
             >
               <!-- Barra del navegador: semáforo + dirección del sitio -->
               <span class="flex items-center gap-3 border-b border-line bg-cream px-3.5 py-2" aria-hidden="true">
