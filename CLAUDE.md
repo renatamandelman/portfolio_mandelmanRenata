@@ -1,6 +1,6 @@
 # Contexto del proyecto (para Claude Code)
 
-Portfolio "Dual View" de Renata Mandelman para el Examen Final de Programación Multimedial IV.
+Portfolio "Split View" de Renata Mandelman para el Examen Final de Programación Multimedial IV.
 Entrega: 19/11/2026. Defensa individual con modificación de código en vivo: **Renata tiene que poder explicar cada línea**.
 
 ## Stack

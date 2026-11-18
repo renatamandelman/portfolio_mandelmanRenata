@@ -1,4 +1,4 @@
-# Renata Mandelman — Portfolio "Dual View"
+# Renata Mandelman — Portfolio "Split View"
 
 Portfolio personal e interactivo para el Examen Final de **Programación Multimedial IV**.
 Una pantalla dividida entre **Creación de Contenido / RRSS**, **Diseño** y **Desarrollo Web**: quien visita elige el modo de lectura con el toggle `[ CONTENT ⇄ DESIGN ⇄ CODE ]`.
@@ -29,7 +29,7 @@ npm run preview    # sirve /dist localmente para probar el build
 └── src/
     ├── components/         # Componentes propios (ViewToggle, ProjectCard, DynamicApiWidget)
     ├── data/profile.ts     # Datos del CV (experiencias, stack)
-    ├── layouts/            # BaseLayout (head/SEO) y SplitLayout (vista dual)
+    ├── layouts/            # BaseLayout (head/SEO) y SplitLayout (las tres columnas)
     ├── pages/index.astro   # Página principal
     └── styles/global.css   # Design tokens y estilos base
 ```
@@ -48,7 +48,19 @@ Además, los layouts tienen su propia lógica: `SplitLayout.astro` arma las tres
 
 ## Tecnologías y decisiones
 
+**Astro** era obligatorio, pero además le queda bien a mi portfolio: casi todo el sitio es contenido que no cambia, así que Astro lo arma como HTML plano y la página carga rápido. El JavaScript lo usé solo donde hace falta: el toggle, los modales y el pedido a GitHub.
 
+**Tailwind CSS (v4)** lo usé porque ya lo conocía y me deja maquetar rápido. No tiene archivo de configuración: mis colores, tipografías y espacios están definidos como *tokens* en `src/styles/global.css`, así si quiero cambiar un color lo cambio en un solo lugar. Para las partes más complejas, como las columnas que cambian según la vista, escribí CSS común dentro de cada componente porque se entiende mejor.
+
+**Tipografías:** Inter para los textos y JetBrains Mono para el toggle y los detalles "de código", que remiten a la parte de programación. Las instalé con Fontsource para que se sirvan desde mi sitio y no dependan de Google Fonts.
+
+**No usé React ni otro framework.** Las interacciones son simples y con TypeScript dentro de los `<script>` de Astro alcanzaba. Sumar un framework hubiera sido más código para explicar sin que la experiencia mejore.
+
+Otras decisiones importantes:
+- **Una sola fuente de verdad para la vista:** la vista elegida vive solo en `<html data-view>`. El toggle la escribe y el CSS la lee. Así no hay dos cosas que se puedan desincronizar.
+- **Los datos separados del diseño:** mi experiencia, las marcas, los proyectos y los textos están en `src/data/profile.ts`. Los componentes reciben esos datos y los muestran, así para sumar algo no toco el HTML.
+- **Elementos nativos primero:** radios para el toggle, `<dialog>` para los modales y `<button>` para todo lo que se toca. Ya vienen accesibles y me ahorran código.
+- **Deploy en Vercel:** como el sitio es estático, Vercel detecta Astro solo y no tuve que configurar nada.
 
 ## API / fuente dinámica
 
@@ -78,20 +90,24 @@ _Completar._
 
 ### El problema que quiero resolver
 
-Mi perfil tiene dos mitades que en un CV quedan desconectadas: **creación de contenido / RRSS** y **desarrollo web** (y en el medio, el **diseño**).
-La idea de "Dual View" es que esa mezcla sea la *forma* del sitio y no solo un dato: la persona que entra elige desde qué lado leerme.
+Mi perfil tiene tres partes que en un CV quedan desconectadas: **creación de contenido / RRSS** , **Diseño** y **desarrollo web** .
+La idea de "Split View" es que esa mezcla sea la *forma* del sitio y no solo un dato: la persona que entra elige desde qué lado leerme.
 
 ### Alternativas que pensé al principio
 
-| Alternativa | Por qué la descarté / elegí |
-| --- | --- |
-| Portfolio de scroll único con secciones | Funciona, pero no muestra la dualidad; parece un CV largo. |
-| Dos páginas separadas (/content y /code) | Rompe la idea de ver los dos mundos a la vez. |
-| **Pantalla dividida + toggle de modo de lectura** ✅ | La interacción principal cambia cómo se lee todo el sitio. Cumple "interacción significativa". |
+- **Portfolio de scroll único con secciones:** funciona, pero no muestra que mis áreas se mezclan; parece un CV largo.
+- **Una página por área (/content, /design, /code):** rompe la idea de ver todo junto.
+- **Pantalla dividida + toggle de modo de lectura** ✅ (la que elegí): la interacción principal cambia cómo se lee todo el sitio.
 
 ---
 
 ### Día 1 — 10/11
+
+**De dónde arranqué**
+
+Mi primer diseño tenía dos columnas, **Content | Code**, con mi nombre grande en el centro y un toggle de dos opciones. Todavía no existía la columna de Design (la sumé en los días 2 y 3).
+
+![Primer diseño: dos columnas, Creación de contenido a la izquierda y Desarrollo web a la derecha, con mi nombre grande en el centro y el toggle Content / Code debajo](referencias/hero.png)
 
 **Qué hice**
 - Armé el proyecto con Astro 7 + Tailwind v4 (como plugin de Vite) y fuentes autoalojadas (Inter y JetBrains Mono).
@@ -103,7 +119,6 @@ La idea de "Dual View" es que esa mezcla sea la *forma* del sitio y no solo un d
 - La vista elegida se guarda en `<html data-view>`: es la única "fuente de verdad". El toggle la escribe y el CSS la lee.
 - Usé **radios nativos** para el toggle en vez de botones con JS, porque ya son accesibles (Tab + flechas, y los lectores de pantalla los anuncian).
 - En desktop, el panel que no está elegido no desaparece: queda como un **riel** vertical que se puede clickear.
-- **Contraste:** mi salmón `#E09F93` sobre el fondo crema da 2.1:1 y no pasa WCAG. Lo uso solo para fondos y decoración, y agregué `#9A4E42` (5.6:1) para texto.
 
 **Problemas**
 - A 390px el menú del header se partía en dos líneas y aparecía scroll horizontal. Lo resolví poniendo el header en columna en mobile y `whitespace-nowrap`.
@@ -125,13 +140,13 @@ La idea de "Dual View" es que esa mezcla sea la *forma* del sitio y no solo un d
 Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar una que me cerrara.
 
 **Lo que probé y descarté**
-1. **Nombre arriba y Design debajo.** Saqué mi nombre del centro y puse los proyectos de diseño abajo. Perdía fuerza: el nombre quedaba como un título más.
+1. **Nombre arriba y Design debajo.** Saqué mi nombre del centro y puse los proyectos de diseño abajo. Perdía fuerza: el nombre quedaba como un título más. 
 2. **Nombre flotando encima de los proyectos de Design.** Quedaba tapando las imágenes y no se entendía.
-3. Volví a la versión original (nombre en el centro de Content | Code) mientras pensaba otra cosa.
+3. Volví a la versión del principio (nombre en el centro de Content | Code, como en la captura del Día 1) mientras pensaba otra cosa. Pero ya no me servía: con Design tenía que haber tres columnas.
 4. **Tres columnas con "muestras" de proyectos.** Cada columna mostraba algunos proyectos y un botón "Ver todo". Mezclaba la portada con las listas y se veía recargado.
 
 **Lo que quedó**
-- Me armé una maqueta en HTML como referencia: tres columnas iguales, **Content | Design | Code** (en el mismo orden que el toggle), con mi nombre y el toggle arriba al centro. No copié su código (usaba Tailwind por CDN, Font Awesome y colores sueltos); la rehice con mis componentes y mis tokens.
+- Me armé una maqueta en HTML con google Stitch como referencia: tres columnas iguales, **Content | Design | Code** (en el mismo orden que el toggle), con mi nombre y el toggle arriba al centro. La rehice con mis componentes y mis tokens.
 - La pantalla de inicio es una **portada visual**: cada columna es una "imagen" (el celular con el reel, un frame tipo Figma con mi proyecto destacado y la paleta real del sitio, y el editor de código).
 - Al tocar un botón, ese panel se agranda y aparecen **sus proyectos** al lado de la imagen. Los otros dos quedan como rieles.
 - En mobile se ve un panel a la vez y se cambia con el toggle, que queda fijo arriba al scrollear.
@@ -169,6 +184,17 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - Los links "Proyectos" y "Experiencia" del header apuntan a partes que en la portada están ocultas.
 - La foto del reel pesa 462 KB y se ve chiquita: achicarla.
 - Completar las otras secciones de este README.
+
+---
+
+### Día 5 — 18/11
+
+**Qué hice**
+- Completé partes del README: a quién está dirigido el portfolio, los componentes propios y las tecnologías y decisiones.
+- Ordené la bitácora: sumé la captura de mi primer diseño (dos columnas) en el Día 1 para que se vea de dónde arranqué.
+
+**Decisiones**
+- **Le cambié el nombre de "Dual View" a "Split View".** "Dual" venía de cuando eran dos áreas (Content y Code). Al sumar Design dejó de tener sentido. "Split View" describe lo que pasa en pantalla, que está dividida, y coincide con el nombre de mi layout, `SplitLayout`.
 
 ---
 
