@@ -52,7 +52,7 @@ Además, los layouts tienen su propia lógica: `SplitLayout.astro` arma las tres
 
 **Tailwind CSS (v4)** lo usé porque ya lo conocía y me deja maquetar rápido. No tiene archivo de configuración: mis colores, tipografías y espacios están definidos como *tokens* en `src/styles/global.css`, así si quiero cambiar un color lo cambio en un solo lugar. Para las partes más complejas, como las columnas que cambian según la vista, escribí CSS común dentro de cada componente porque se entiende mejor.
 
-**Tipografías:** Inter para los textos y JetBrains Mono para el toggle y los detalles "de código", que remiten a la parte de programación. Las instalé con Fontsource para que se sirvan desde mi sitio y no dependan de Google Fonts.
+**Tipografías:** Bricolage Grotesque para mi nombre y los títulos, porque es amable y con personalidad; Inter para los textos y JetBrains Mono para el toggle y los detalles "de código", que remiten a la parte de programación. Las instalé con Fontsource para que se sirvan desde mi sitio y no dependan de Google Fonts.
 
 **No usé React ni otro framework.** Las interacciones son simples y con TypeScript dentro de los `<script>` de Astro alcanzaba. Sumar un framework hubiera sido más código para explicar sin que la experiencia mejore.
 
@@ -111,7 +111,7 @@ Cosas que sé que todavía se pueden mejorar:
 
 ## Créditos y uso de IA
 
-- **Tipografías:** Inter y JetBrains Mono (SIL Open Font License), instaladas con Fontsource.
+- **Tipografías:** Bricolage Grotesque, Inter y JetBrains Mono (SIL Open Font License), instaladas con Fontsource.
 - **Videos UGC y de redes:** son trabajos míos para cada marca. Los nombres y productos (La Roche-Posay, Vichy, CeraVe, Maybelline, Cocinarg, entre otras) pertenecen a sus marcas y aparecen solo para mostrar mi trabajo.
 - **Videos de TikTok e Instagram:** se muestran con los reproductores oficiales de cada plataforma (embeds).
 - **Proyectos de diseño:** son míos; las versiones completas están en mi Behance.
@@ -268,6 +268,8 @@ Fue el día de rediseñar la estructura. Probé varias versiones hasta encontrar
 - **Trabajo real en la portada:** saqué las maquetas (el frame de Figma con la paleta y el editor con código de ejemplo). Ahora Diseño muestra un collage con 3 trabajos de Behance y Programación una captura de un sitio que hice (Mentes Brillantes), y cada uno lleva al proyecto real.
 - **Menos CV:** saqué la sección Experiencia y reescribí "Sobre mí" en primera persona y sin jerga.
 - **Refresh visual:** el bloque del nombre tapa las líneas entre columnas, los subtítulos se leen como frases y los botones van en mi salmón con texto oscuro. La portada entra en una pantalla de 1440×900.
+- **Saqué las tarjetas de números de Redes sociales** (marcas, videos, interacción): eran más "datos de CV" que trabajo. Ahora esa columna muestra solo mi reel.
+- **Tipografía nueva para mi nombre y los títulos: Bricolage Grotesque.** Inter en mayúsculas se veía seca. Bricolage es más amable y tiene más personalidad, y la escribo en minúsculas para que se sienta más cercana. La sumé como token (`--font-display` en `global.css`), así Tailwind genera la clase `font-display` y cambiarla es tocar una sola línea.
 
 **Decisiones**
 - **Cambié solo los textos, no los nombres internos.** Los estados siguen siendo `content`, `design` y `code` en el código. Así no tuve que tocar el CSS ni lo que ya estaba guardado en `localStorage`.

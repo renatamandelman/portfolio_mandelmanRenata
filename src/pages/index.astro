@@ -19,8 +19,6 @@ import {
   profile,
   experiences,
   stack,
-  contentStats,
-  engagement,
   socials,
   contact,
   projects,
@@ -47,7 +45,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
   <!-- Nombre + rol. En la portada (desktop) SplitLayout lo hace flotar arriba al centro -->
   <Fragment slot="hero">
     <h1
-      class="text-4xl leading-[0.92] font-black tracking-tight uppercase md:text-5xl xl:text-[3.375rem]"
+      class="font-display text-5xl leading-[0.95] font-extrabold tracking-tight md:text-6xl xl:text-[4.25rem]"
     >
       <!-- En mobile el nombre va en dos líneas; desde md, en una -->
       Renata <br class="md:hidden" />Mandelman
@@ -63,7 +61,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
     <header>
       <h2
         id="pane-content-title"
-        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
+        class="font-display text-2xl leading-snug font-bold tracking-tight md:text-3xl"
       >
         Redes sociales
       </h2>
@@ -75,12 +73,12 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
          Panel ancho (vista de esta área en desktop) → imagen a la izquierda, proyectos a la derecha -->
     <div class="@container">
       <div class="@4xl:grid @4xl:grid-cols-[minmax(0,26rem)_1fr] @4xl:items-start @4xl:gap-12">
-        <!-- IMAGEN: métricas + engagement a la izquierda, celular a la derecha (grilla de 12 columnas) -->
-        <div class="mx-auto my-5 grid w-full max-w-md grid-cols-12 items-start gap-2.5">
+        <!-- IMAGEN: el celular con un reel mío, centrado -->
+        <div class="mx-auto my-5 w-full max-w-md">
           <!-- Celular con Reels: muestra heroVideo. El reproductor de TikTok se carga
                recién al tocar play (lo agrega el script de abajo). -->
           <div
-            class="relative col-span-7 row-span-2 mx-auto aspect-[9/16] w-full max-w-[190px] overflow-hidden rounded-2xl border-2 border-surface bg-linear-to-b from-accent to-ink shadow-xl"
+            class="relative mx-auto aspect-[9/16] w-full max-w-[200px] overflow-hidden rounded-2xl border-2 border-surface bg-linear-to-b from-accent to-ink shadow-xl"
             data-hero-video={heroVideo && embedUrl(heroVideo, true)}
             data-hero-title={heroVideo && `${heroVideo.brand}: ${heroVideo.title}`}
           >
@@ -118,23 +116,6 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
             }
           </div>
 
-          <!-- Métricas en 2 x 2 (order-first: en la grilla van antes que el celular, a la izquierda) -->
-          <ul class="order-first col-span-5 grid grid-cols-2 gap-2">
-            {
-              contentStats.map((stat) => (
-                <li class="bento flex flex-col p-2.5">
-                  <span class="text-base font-extrabold tracking-tight">{stat.value}</span>
-                  <span class="text-[9px] font-semibold text-muted uppercase">{stat.label}</span>
-                </li>
-              ))
-            }
-          </ul>
-
-          <!-- Interacción promedio (engagement) -->
-          <div class="col-span-5 rounded-[var(--radius-bento)] bg-accent-soft p-2.5">
-            <span class="block text-base font-extrabold tracking-tight">{engagement.value}</span>
-            <span class="text-[9px] font-semibold text-accent-ink uppercase">{engagement.label}</span>
-          </div>
         </div>
 
         <!-- PROYECTOS (vista Content): marcas con las que trabajé, cada una abre su modal con tareas y videos.
@@ -155,7 +136,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
     <header>
       <h2
         id="pane-design-title"
-        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
+        class="font-display text-2xl leading-snug font-bold tracking-tight md:text-3xl"
       >
         Diseño
       </h2>
@@ -261,7 +242,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
     <header class="md:text-right">
       <h2
         id="pane-code-title"
-        class="text-xl leading-snug font-extrabold tracking-tight uppercase md:text-2xl"
+        class="font-display text-2xl leading-snug font-bold tracking-tight md:text-3xl"
       >
         Programación
       </h2>
@@ -337,7 +318,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
         class="mx-auto aspect-square w-48 rounded-full border border-line object-cover object-[50%_25%] md:w-64"
       />
       <div>
-        <h2 id="sobre-mi-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">Sobre mí</h2>
+        <h2 id="sobre-mi-title" class="font-display text-2xl font-bold tracking-tight md:text-3xl">Sobre mí</h2>
         <p class="eyebrow mt-1">{profile.location}</p>
         <div class="mt-4 max-w-prose space-y-4 leading-relaxed">
           {profile.about.map((paragraph) => <p>{paragraph}</p>)}
@@ -350,7 +331,7 @@ const heroVideo = experiences.flatMap((e) => e.videos ?? []).find((v) => v.src =
   <!-- Los datos salen de contact y socials (profile.ts). Centrado, como cierre de la página -->
   <Fragment slot="contact">
     <div class="mx-auto max-w-2xl text-center">
-      <h2 id="contacto-title" class="text-xl font-extrabold tracking-tight uppercase md:text-2xl">¿Trabajamos juntos?</h2>
+      <h2 id="contacto-title" class="font-display text-2xl font-bold tracking-tight md:text-3xl">¿Trabajamos juntos?</h2>
       <p class="mt-3 leading-relaxed text-muted">
         Contenido UGC para marcas, diseño gráfico o un sitio web: escribime y lo charlamos.
       </p>

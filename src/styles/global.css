@@ -10,6 +10,7 @@
 @import '@fontsource-variable/inter';
 @import '@fontsource/jetbrains-mono/400.css';
 @import '@fontsource/jetbrains-mono/500.css';
+@import '@fontsource-variable/bricolage-grotesque'; /* nombre y títulos */
 
 @theme {
   /* --- Color --------------------------------------------------------------- */
@@ -28,6 +29,8 @@
   /* --- Tipografía ---------------------------------------------------------- */
   --font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', monospace;
+  /* Títulos: más amable y con personalidad que Inter. Genera la clase font-display */
+  --font-display: 'Bricolage Grotesque Variable', ui-sans-serif, system-ui, sans-serif;
 
   /* --- Bento --------------------------------------------------------------- */
   --radius-bento: 1.25rem;

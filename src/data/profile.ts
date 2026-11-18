@@ -271,28 +271,3 @@ export const stack = {
   code: ['HTML5', 'CSS3', 'JavaScript', 'React', 'Astro', 'Tailwind', 'Node.js', 'Express', 'Git'],
   content: ['Figma', 'Adobe CC', 'After Effects', 'CapCut', 'Canva'],
 };
-
-/**
- * Métricas del lado Content (tarjetas chicas del hero).
- * Se calculan con los datos de arriba: si sumo un video o una pieza, el número se actualiza solo.
- * El "+" es porque en el portfolio está una selección: hice más de los que muestro.
- */
-const allVideos = experiences.flatMap((job) => job.videos ?? []);
-// Set: guarda cada marca una sola vez (Vichy tiene dos videos pero cuenta como una marca)
-const brandCount = new Set(allVideos.map((video) => video.brand)).size;
-
-export const contentStats = [
-  { value: `+${brandCount}`, label: 'Marcas' },
-  { value: '2023', label: 'Desde' },
-  { value: `+${allVideos.length}`, label: 'Videos' },
-  { value: `+${designWork.length}`, label: 'Diseños' },
-];
-
-/**
- * Tarjeta de engagement: mi tasa de interacción promedio (dato de mis estadísticas).
- * "Interacción" en vez de "engagement": que lo entienda cualquiera.
- */
-export const engagement = {
-  value: '11,55%',
-  label: 'Interacción promedio',
-};
