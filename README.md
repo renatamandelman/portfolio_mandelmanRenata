@@ -250,6 +250,13 @@ Este día rehice la estructura. Probé varias versiones hasta que una me cerró.
 
 ---
 
+### Día 6 — 19/11
+
+- La palabra PORTFOLIO del hero era blanca y casi no se veía sobre el fondo verde agua. La pasé a verde petróleo (`accent-ink`) y le saqué la sombra, que ya no hacía falta.
+- Armé la portada A4 del documento de entrega con la misma estética que la home. Al pasarla a PDF las sombras salían como manchas grises, así que las cambié por bordes finos.
+
+---
+
 ### Uso de IA
 
 Usé dos herramientas, cada una para algo distinto:
